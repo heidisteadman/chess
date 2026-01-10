@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -95,7 +94,7 @@ public class ChessPiece {
             downRow = myPosition.getRow() - 1;
             leftCol = myPosition.getColumn() - 1;
 
-            while (downRow > 0 && leftCol > 0) {
+            while (downRow > 0 && leftCol > 0) { // bishop move down-left
                 ChessPosition end = new ChessPosition(downRow, leftCol);
                 ChessMove newMove = new ChessMove(myPosition, end, null);
                 newPieceMoves.add(newMove);
@@ -105,9 +104,61 @@ public class ChessPiece {
 
             return newPieceMoves;
 
+        } else if (piece.getPieceType() == PieceType.KING) { // code for how a king moves
+            return kingMoves(myPosition);
         }
-        ArrayList<ChessMove> newPieceMoves = new ArrayList<ChessMove>();
-        return newPieceMoves;
+
+        return new ArrayList<ChessMove>();
+    }
+
+    private ArrayList<ChessMove> kingMoves(ChessPosition myPosition){
+        ArrayList<ChessMove> myKingMoves = new ArrayList<ChessMove>();
+
+        if ((myPosition.getRow()+1) <= 8) { // king move up
+            ChessPosition kingUp = new ChessPosition((myPosition.getRow() + 1), myPosition.getColumn());
+            ChessMove kingMoveUp = new ChessMove(myPosition, kingUp, null);
+            myKingMoves.add(kingMoveUp);
+            if ((myPosition.getColumn()+1) <= 8) { //king move up right
+                ChessPosition kingUpRight = new ChessPosition((myPosition.getRow()+1), (myPosition.getColumn()+1));
+                ChessMove kingMoveUpRight = new ChessMove(myPosition, kingUpRight, null);
+                myKingMoves.add(kingMoveUpRight);
+            }
+            if ((myPosition.getColumn()-1) > 0) { // king move up left
+                ChessPosition kingUpLeft = new ChessPosition((myPosition.getRow()+1),(myPosition.getColumn()-1));
+                ChessMove kingMoveUpLeft = new ChessMove(myPosition, kingUpLeft, null);
+                myKingMoves.add(kingMoveUpLeft);
+            }
+        }
+
+        if ((myPosition.getRow()-1) > 0) { // king move down
+            ChessPosition kingDown = new ChessPosition((myPosition.getRow() - 1), myPosition.getColumn());
+            ChessMove kingMoveDown = new ChessMove(myPosition, kingDown, null);
+            myKingMoves.add(kingMoveDown);
+            if ((myPosition.getColumn()+1) <= 8) { // king move down right
+                ChessPosition kingDownRight = new ChessPosition((myPosition.getRow()-1), (myPosition.getColumn()+1));
+                ChessMove kingMoveDownRight = new ChessMove(myPosition, kingDownRight, null);
+                myKingMoves.add(kingMoveDownRight);
+            }
+            if ((myPosition.getColumn()-1) > 0) { // king move down left
+                ChessPosition kingDownLeft = new ChessPosition((myPosition.getRow()-1), (myPosition.getColumn()-1));
+                ChessMove kingMoveDownLeft = new ChessMove(myPosition, kingDownLeft, null);
+                myKingMoves.add(kingMoveDownLeft);
+            }
+        }
+
+        if ((myPosition.getColumn()+1) <= 8) { // king move right
+            ChessPosition kingRight = new ChessPosition(myPosition.getRow(), (myPosition.getColumn()+1));
+            ChessMove kingMoveRight = new ChessMove(myPosition, kingRight, null);
+            myKingMoves.add(kingMoveRight);
+        }
+
+        if ((myPosition.getColumn()-1) > 0) { // king move left
+            ChessPosition kingLeft = new ChessPosition(myPosition.getRow(), (myPosition.getColumn()-1));
+            ChessMove kingMoveLeft = new ChessMove(myPosition, kingLeft, null);
+            myKingMoves.add(kingMoveLeft);
+        }
+
+        return myKingMoves;
     }
 
     @Override

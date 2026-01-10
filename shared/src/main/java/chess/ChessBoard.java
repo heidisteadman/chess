@@ -35,11 +35,15 @@ public class ChessBoard {
         return squares[position.getRow()-1][position.getColumn()-1];
     }
 
+    public boolean checkPiece(ChessPosition position) {
+        return squares[position.getRow()][position.getColumn()] != null;
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        squares = new ChessPiece[8][8];
     }
 }
