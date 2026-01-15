@@ -63,6 +63,12 @@ public class ChessPiece {
             return kingMoves(board, myPosition);
         } else if (piece.getPieceType() == PieceType.KNIGHT) {
             return knightMoves(board, myPosition);
+        } else if (piece.getPieceType() == PieceType.PAWN) {
+            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                return whitePawnMoves(board, myPosition);
+            } else {
+                return blackPawnMoves(board, myPosition);
+            }
         }
 
         return new ArrayList<ChessMove>();
@@ -403,6 +409,164 @@ public class ChessPiece {
             }
         }
         return myKnightMoves;
+    }
+
+    private ArrayList<ChessMove> whitePawnMoves (ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> myWhitePawnMoves = new ArrayList<>();
+        ChessPiece piece = board.getPiece(myPosition);
+
+        ChessPosition checkUp = new ChessPosition((myPosition.getRow()), (myPosition.getColumn()-1));
+        ChessPosition oneForward = new ChessPosition((myPosition.getRow()+1), (myPosition.getColumn()));
+        ChessMove moveForward = new ChessMove(myPosition, oneForward, null);
+        if (myPosition.getRow() == 2) { // check if pawn is in starting position
+            if (!board.checkPiece(checkUp)) { // move forward one
+                myWhitePawnMoves.add(moveForward);
+                ChessPosition checkTwoUp = new ChessPosition((myPosition.getRow()+1), (myPosition.getColumn()-1));
+                if (!board.checkPiece(checkTwoUp)) { // move forward two
+                    ChessPosition twoForward = new ChessPosition((myPosition.getRow()+2), myPosition.getColumn());
+                    ChessMove moveTwoForward = new ChessMove(myPosition, twoForward, null);
+                    myWhitePawnMoves.add(moveTwoForward);
+                }
+            }
+        } else if (myPosition.getRow() != 7){ // check if pawn promotes moving forward
+            if (!board.checkPiece(checkUp)) { // move one
+               myWhitePawnMoves.add(moveForward);
+            }
+        } else { // piece can be promoted
+            if (!board.checkPiece(checkUp)) {
+                ChessMove moveUpPromoteRook = new ChessMove(myPosition, oneForward, PieceType.ROOK);
+                ChessMove moveUpPromoteKnight = new ChessMove(myPosition, oneForward, PieceType.KNIGHT);
+                ChessMove moveUpPromoteQueen = new ChessMove(myPosition, oneForward, PieceType.QUEEN);
+                ChessMove moveUpPromoteBishop = new ChessMove(myPosition, oneForward, PieceType.BISHOP);
+                myWhitePawnMoves.add(moveUpPromoteBishop);
+                myWhitePawnMoves.add(moveUpPromoteKnight);
+                myWhitePawnMoves.add(moveUpPromoteQueen);
+                myWhitePawnMoves.add(moveUpPromoteRook);
+            }
+        }
+        ChessPosition upLeft = new ChessPosition((myPosition.getRow()+1), (myPosition.getColumn()-1));
+        ChessPosition checkUpLeft = new ChessPosition((myPosition.getRow()),(myPosition.getColumn()-2));
+        if (myPosition.getColumn()-1 > 0) {
+            if (board.checkPiece(checkUpLeft)) {
+                ChessPiece upLeftPiece = board.getPiece(upLeft);
+                if (upLeftPiece.getTeamColor() != piece.getTeamColor()) {
+                    if (myPosition.getRow() != 7) {
+                        ChessMove moveUpLeft = new ChessMove(myPosition, upLeft, null);
+                        myWhitePawnMoves.add(moveUpLeft);
+                    } else {
+                        ChessMove upLeftPromoteRook = new ChessMove(myPosition, upLeft, PieceType.ROOK);
+                        myWhitePawnMoves.add(upLeftPromoteRook);
+                        ChessMove upLeftPromoteKnight = new ChessMove(myPosition, upLeft, PieceType.KNIGHT);
+                        myWhitePawnMoves.add(upLeftPromoteKnight);
+                        ChessMove upLeftPromoteBishop = new ChessMove(myPosition, upLeft, PieceType.BISHOP);
+                        myWhitePawnMoves.add(upLeftPromoteBishop);
+                        ChessMove upLeftPromoteQueen = new ChessMove(myPosition, upLeft, PieceType.QUEEN);
+                        myWhitePawnMoves.add(upLeftPromoteQueen);
+                    }
+                }
+            }
+        }
+        ChessPosition upRight = new ChessPosition((myPosition.getRow()+1), (myPosition.getColumn()+1));
+        ChessPosition checkUpRight = new ChessPosition((myPosition.getRow()), (myPosition.getColumn()));
+        if (myPosition.getColumn()+1 <= 8) {
+            if (board.checkPiece(checkUpRight)) {
+                ChessPiece upRightPiece = board.getPiece(upRight);
+                if (upRightPiece.getTeamColor() != piece.getTeamColor()) {
+                    if (myPosition.getRow() != 7) {
+                        ChessMove moveUpRight = new ChessMove(myPosition, upRight, null);
+                        myWhitePawnMoves.add(moveUpRight);
+                    } else {
+                        ChessMove upRightPromoteRook = new ChessMove(myPosition, upRight, PieceType.ROOK);
+                        myWhitePawnMoves.add(upRightPromoteRook);
+                        ChessMove upRightPromoteKnight = new ChessMove(myPosition, upRight, PieceType.KNIGHT);
+                        myWhitePawnMoves.add(upRightPromoteKnight);
+                        ChessMove upRightPromoteBishop = new ChessMove(myPosition, upRight, PieceType.BISHOP);
+                        myWhitePawnMoves.add(upRightPromoteBishop);
+                        ChessMove upRightPromoteQueen = new ChessMove(myPosition, upRight, PieceType.QUEEN);
+                        myWhitePawnMoves.add(upRightPromoteQueen);
+                    }
+                }
+            }
+        }
+        return myWhitePawnMoves;
+    }
+
+    private ArrayList<ChessMove> blackPawnMoves (ChessBoard board, ChessPosition myPosition) {
+        ArrayList<ChessMove> myBlackPawnMoves = new ArrayList<>();
+        ChessPiece piece = board.getPiece(myPosition);
+
+        ChessPosition oneForward = new ChessPosition((myPosition.getRow()-1), myPosition.getColumn());
+        ChessPosition checkForward = new ChessPosition((myPosition.getRow()-2), (myPosition.getColumn()-1));
+        ChessMove moveForward = new ChessMove(myPosition, oneForward, null);
+        if (myPosition.getRow() == 7) { // check beginning position
+            if (!board.checkPiece(checkForward)) { // move one forward
+                myBlackPawnMoves.add(moveForward);
+                ChessPosition twoForward = new ChessPosition((myPosition.getRow()-2), myPosition.getColumn());
+                ChessPosition checkTwoForward = new ChessPosition((myPosition.getRow()-3), (myPosition.getColumn()-1));
+                if (!board.checkPiece(checkTwoForward)) { // move two forward
+                    ChessMove moveTwoForward = new ChessMove(myPosition, twoForward, null);
+                    myBlackPawnMoves.add(moveTwoForward);
+                }
+            }
+        } else if (myPosition.getRow() != 2){
+            if (!board.checkPiece(checkForward)) { // move one forward if not at start
+                myBlackPawnMoves.add(moveForward);
+            }
+        } else {
+            ChessMove moveForwardPromoteRook = new ChessMove(myPosition, oneForward, PieceType.ROOK);
+            myBlackPawnMoves.add(moveForwardPromoteRook);
+            ChessMove moveForwardPromoteKnight = new ChessMove(myPosition, oneForward, PieceType.KNIGHT);
+            myBlackPawnMoves.add(moveForwardPromoteKnight);
+            ChessMove moveForwardPromoteBishop = new ChessMove(myPosition, oneForward, PieceType.BISHOP);
+            myBlackPawnMoves.add(moveForwardPromoteBishop);
+            ChessMove moveForwardPromoteQueen = new ChessMove(myPosition, oneForward, PieceType.QUEEN);
+            myBlackPawnMoves.add(moveForwardPromoteQueen);
+        }
+        ChessPosition checkForwardRight = new ChessPosition((myPosition.getRow()-2), (myPosition.getColumn()-2));
+        ChessPosition forwardRight = new ChessPosition((myPosition.getRow()-1), (myPosition.getColumn()-1));
+        if ((myPosition.getColumn()-1) > 0) {
+            if (board.checkPiece(checkForwardRight)) {
+                ChessPiece forwardRightPiece = board.getPiece(forwardRight);
+                if (forwardRightPiece.getTeamColor() != piece.getTeamColor()) {
+                    if (myPosition.getRow() != 2) {
+                        ChessMove moveForwardRight = new ChessMove(myPosition, forwardRight, null);
+                        myBlackPawnMoves.add(moveForwardRight);
+                    } else {
+                        ChessMove moveForwardRightPromoteRook = new ChessMove(myPosition, forwardRight, PieceType.ROOK);
+                        myBlackPawnMoves.add(moveForwardRightPromoteRook);
+                        ChessMove moveForwardRightPromoteKnight = new ChessMove(myPosition, forwardRight, PieceType.KNIGHT);
+                        myBlackPawnMoves.add(moveForwardRightPromoteKnight);
+                        ChessMove moveForwardRightPromoteBishop = new ChessMove(myPosition, forwardRight, PieceType.BISHOP);
+                        myBlackPawnMoves.add(moveForwardRightPromoteBishop);
+                        ChessMove moveForwardRightPromoteQueen = new ChessMove(myPosition, forwardRight, PieceType.QUEEN);
+                        myBlackPawnMoves.add(moveForwardRightPromoteQueen);
+                    }
+                }
+            }
+        }
+        ChessPosition checkForwardLeft = new ChessPosition((myPosition.getRow()-2), (myPosition.getColumn()));
+        ChessPosition forwardLeft = new ChessPosition((myPosition.getRow()-1), (myPosition.getColumn()+1));
+        if (myPosition.getColumn()+1 <= 8) {
+            if (board.checkPiece(checkForwardLeft)) {
+                ChessPiece forwardLeftPiece = board.getPiece(forwardLeft);
+                if (forwardLeftPiece.getTeamColor() != piece.getTeamColor()) {
+                    if (myPosition.getRow() != 2) {
+                        ChessMove moveForwardLeft = new ChessMove(myPosition, forwardLeft, null);
+                        myBlackPawnMoves.add(moveForwardLeft);
+                    } else {
+                        ChessMove moveForwardLeftPromoteRook = new ChessMove(myPosition, forwardLeft, PieceType.ROOK);
+                        myBlackPawnMoves.add(moveForwardLeftPromoteRook);
+                        ChessMove moveForwardLeftPromoteKnight = new ChessMove(myPosition, forwardLeft, PieceType.KNIGHT);
+                        myBlackPawnMoves.add(moveForwardLeftPromoteKnight);
+                        ChessMove moveForwardLeftPromoteBishop = new ChessMove(myPosition, forwardLeft, PieceType.BISHOP);
+                        myBlackPawnMoves.add(moveForwardLeftPromoteBishop);
+                        ChessMove moveForwardLeftPromoteQueen = new ChessMove(myPosition, forwardLeft, PieceType.QUEEN);
+                        myBlackPawnMoves.add(moveForwardLeftPromoteQueen);
+                    }
+                }
+            }
+        }
+        return myBlackPawnMoves;
     }
 
     @Override
