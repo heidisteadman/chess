@@ -57,8 +57,22 @@ public class ChessGame {
             return new ArrayList<>();
         }
 
+        ArrayList<ChessMove> valid = new ArrayList<>();
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-
+        for (ChessMove move : moves) {
+            ChessPosition end = move.getEndPosition();
+            board.addPiece(end, piece);
+            board.removePiece(startPosition);
+            if (isInCheck(color)) {
+                board.addPiece(startPosition, piece);
+                board.removePiece(end);
+            } else {
+                board.addPiece(startPosition, piece);
+                board.removePiece(end);
+                valid.add(move);
+            }
+        }
+        return valid;
     }
 
     /**
