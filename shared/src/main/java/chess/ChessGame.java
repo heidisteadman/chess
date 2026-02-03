@@ -93,17 +93,52 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition start = move.getStartPosition();
-        Collection<ChessMove> moves = validMoves(start);
         ChessBoard board = getBoard();
-        ChessPiece piece = board.getPiece(start);
-        ChessPosition end = move.getEndPosition();
 
-        if (moves.contains(move)) {
+        ChessPiece piece;
+        ChessPosition checkStart = new ChessPosition((start.getRow()-1), (start.getColumn()-1));
+        if (board.checkPiece(checkStart)) {
+            piece = board.getPiece(start);
+        } else {
+            throw new InvalidMoveException("There is not a piece at the start position");
+        }
+
+        if (move.getPromotionPiece() != null) {
+            makePawnPromote(move);
+            return;
+        }
+
+        Collection<ChessMove> moves = validMoves(start);
+
+        ChessPosition end = move.getEndPosition();
+        TeamColor current = piece.getTeamColor();
+
+        if ((moves.contains(move))&&(current == getTeamTurn())) {
             board.addPiece(end, piece);
             board.removePiece(start);
+            TeamColor newColor;
+            if (current == TeamColor.BLACK) {
+                newColor = TeamColor.WHITE;
+            } else {
+                newColor = TeamColor.BLACK;
+            }
+            setTeamTurn(newColor);
         } else {
             throw new InvalidMoveException("Invalid move");
         }
+    }
+
+
+    private void makePawnPromote(ChessMove move) {
+        ChessPosition start = move.getStartPosition();
+        ChessBoard board = getBoard();
+        ChessPiece piece = board.getPiece(start);
+        TeamColor pawnColor = piece.getTeamColor();
+
+        ChessPiece.PieceType promotionType = move.getPromotionPiece();
+        ChessPiece pawnPromote = new ChessPiece(pawnColor, promotionType);
+        board.addPiece((move.getEndPosition()), pawnPromote);
+        board.removePiece(start);
     }
 
     /**
