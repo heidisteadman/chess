@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -50,8 +51,14 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessBoard board = getBoard();
+        TeamColor color = getTeamTurn();
         ChessPiece piece = board.getPiece(startPosition);
-        return piece.pieceMoves(board, startPosition);
+        if (piece.getTeamColor() != color) {
+            return new ArrayList<>();
+        }
+
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
     }
 
     /**
@@ -82,8 +89,52 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessBoard board = getBoard();
+        ChessPosition kingPos = board.findPiece(ChessPiece.PieceType.KING, teamColor, board);
+
+        for (int i=1; i<=8; i++) {
+            for (int j=1; j<=8; j++) {
+                ChessPosition pos = new ChessPosition(i, j);
+                ChessPosition checkPos = new ChessPosition((i-1), (j-1));
+                if (board.checkPiece(checkPos)) {
+                    ChessPiece piece = board.getPiece(pos);
+                    if ((piece.getTeamColor() != teamColor)&&(piece.getPieceType() != ChessPiece.PieceType.PAWN)) {
+                        Collection<ChessMove> moves = piece.pieceMoves(board, pos);
+                        ChessMove check = new ChessMove(pos, kingPos, null);
+                        if (moves.contains(check)) {
+                            return true;
+                        }
+                    } else if (piece.getTeamColor()!=teamColor) {
+                        ArrayList<ChessMove> pawns = addPawns(pos, kingPos);
+                        Collection<ChessMove> moves = piece.pieceMoves(board, pos);
+                        for (ChessMove move : pawns) {
+                            if (moves.contains(move)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
+
+    private ArrayList<ChessMove> addPawns(ChessPosition start, ChessPosition end) {
+        ArrayList<ChessMove> pawns = new ArrayList<>();
+        ChessMove pawnRook = new ChessMove(start, end, ChessPiece.PieceType.ROOK);
+        ChessMove pawnQueen = new ChessMove(start, end, ChessPiece.PieceType.QUEEN);
+        ChessMove pawnBishop = new ChessMove(start, end, ChessPiece.PieceType.BISHOP);
+        ChessMove pawnKnight = new ChessMove(start, end, ChessPiece.PieceType.KNIGHT);
+        ChessMove pawnNull = new ChessMove(start, end, null);
+        pawns.add(pawnRook);
+        pawns.add(pawnKnight);
+        pawns.add(pawnBishop);
+        pawns.add(pawnQueen);
+        pawns.add(pawnNull);
+        return pawns;
+    }
+
 
     /**
      * Determines if the given team is in checkmate
