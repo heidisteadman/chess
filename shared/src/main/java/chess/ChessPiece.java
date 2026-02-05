@@ -841,7 +841,7 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return "ChessPiece{" +
+        return "{" +
                 pieceColor +
                 type +
                 '}';

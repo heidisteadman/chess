@@ -247,7 +247,7 @@ public class ChessGame {
             }
         }
 
-        return possibleMoves.isEmpty();
+        return (possibleMoves.isEmpty()) && (!isInCheck(teamColor));
     }
 
     /**
