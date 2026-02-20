@@ -1,8 +1,10 @@
 package server;
 
 import io.javalin.*;
+import server.handlers.RegisterHandler;
 
 public class Server {
+    RegisterHandler register = new RegisterHandler();
 
     private final Javalin javalin;
 
