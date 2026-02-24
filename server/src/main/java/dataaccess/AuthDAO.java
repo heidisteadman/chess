@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class AuthDAO {
-    ArrayList<AuthData> authTokens = new ArrayList<>();
+    static ArrayList<AuthData> authTokens = new ArrayList<>();
 
-    public AuthData createAuth(UserData a) {
+    public static void createAuth(UserData a) {
         String token = UUID.randomUUID().toString();
-        AuthData newToken = new AuthData(UserData.getUser(), token);
+        String user = a.getUser();
+        AuthData newToken = new AuthData(token, user);
         authTokens.add(newToken);
-        return newToken;
     }
 
     public boolean checkAuth(AuthData a) {
