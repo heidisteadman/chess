@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
+import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
@@ -15,21 +16,19 @@ public class UserService {
     public record LoginResponse(String username, String authToken) {}
     public record LogoutRequest(String authToken) {}
     public record LogoutResponse(String message) {}
-    public record ClearUserRequest() {}
-    public record ClearUserResponse() {}
 
-    public RegisterResponse register(RegisterRequest r) throws DataAccessException {
+    public static RegisterResponse register(RegisterRequest r) throws ResponseException {
         UserData newUser = new UserData(r.username, r.password, r.email);
         UserData findUser = UserDAO.getUser(r.username);
         if (findUser != null) {
             UserDAO.insertUser(newUser);
             return new RegisterResponse(r.username, r.password);
         } else {
-            throw new DataAccessException("403: Error: Already Taken");
+            throw new ResponseException(403, "Error: Already Taken");
         }
     }
 
-    public LoginResponse login(LoginRequest l) throws DataAccessException {
+    public static LoginResponse login(LoginRequest l) throws ResponseException {
         UserData logUser = UserDAO.getUser(l.username);
         if (logUser != null) {
             String pass = l.password;
@@ -39,14 +38,14 @@ public class UserService {
                 String token = tokenData.getToken();
                 return new LoginResponse(l.username, token);
             } else {
-                throw new DataAccessException("401: Error: Unauthorized");
+                throw new ResponseException(401, "Error: Unauthorized");
             }
         } else {
-            throw new DataAccessException("400: Error: Bad Request");
+            throw new ResponseException(400, "Error: bad request");
         }
     }
 
-    public LogoutResponse logout(LogoutRequest l) throws DataAccessException {
+    public static LogoutResponse logout(LogoutRequest l) throws ResponseException {
         AuthData logAuth = AuthDAO.findAuth(l.authToken);
         if (logAuth != null) {
             UserData logUser = UserDAO.getUser(logAuth.getUser());
@@ -54,12 +53,11 @@ public class UserService {
             AuthDAO.deleteAuth(logAuth);
             return new LogoutResponse("Logout Success");
         } else {
-            throw new DataAccessException("401: Error: Unauthorized");
+            throw new ResponseException(401, "Error: Unauthorized");
         }
     }
 
-    public ClearUserResponse clearUser(ClearUserRequest c) {
+    public static void clearUser() {
         UserDAO.clearUserDB();
-        return new ClearUserResponse();
     }
 }

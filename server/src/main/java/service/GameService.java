@@ -4,6 +4,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
+import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -12,32 +13,24 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class GameService {
-    public record ListGamesRequest(String authToken, String whiteUsername, String blackUsername) {}
+    public record ListGamesRequest(String authToken) {}
     public record ListGamesResponse(ArrayList<GameData> gameList) {}
     public record CreateGameRequest(String authToken, String gameName) {}
     public record CreateGameResponse(int gameID) {}
     public record JoinGameRequest(String authToken, String color, String gameID) {}
     public record JoinGameResponse() {}
-    public record ClearGamesRequest() {}
-    public record ClearGamesResponse() {}
 
-    public ListGamesResponse listGames(ListGamesRequest l) throws DataAccessException {
+    public static ListGamesResponse listGames(ListGamesRequest l) throws ResponseException {
         AuthData auth = AuthDAO.findAuth(l.authToken);
         if (auth == null) {
-            throw new DataAccessException("401: Error: Unauthorized");
+            throw new ResponseException(401, "Error: Unauthorized");
         }
 
-        if (l.whiteUsername != null) {
-            UserData white = UserDAO.getUser(l.whiteUsername);
-            ArrayList<GameData> games = UserDAO.listGames(white);
-            return new ListGamesResponse(games);
-        } else if (l.blackUsername != null) {
-            UserData black = UserDAO.getUser(l.blackUsername);
-            ArrayList<GameData> games = UserDAO.listGames(black);
-            return new ListGamesResponse(games);
-        } else {
-            throw new DataAccessException("500: Error: No username provided");
-        }
+        String username = auth.getUser();
+        UserData user = UserDAO.getUser(username);
+        ArrayList<GameData> game = UserDAO.listGames(user);
+
+        return new ListGamesResponse(game);
     }
 
     public CreateGameResponse createGame(CreateGameRequest c) throws DataAccessException {
@@ -71,8 +64,7 @@ public class GameService {
         }
     }
 
-    public ClearGamesResponse clearGames(ClearGamesRequest c) {
+    public static void clearGames() {
         GameDAO.clearGameDB();
-        return new ClearGamesResponse();
     }
 }

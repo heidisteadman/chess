@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -26,11 +27,11 @@ public class UserDAO {
         return null;
     }
 
-    public static void deleteUser(UserData u) throws DataAccessException{
+    public static void deleteUser(UserData u) throws ResponseException {
         if (users.contains(u)) {
             users.remove(u);
         } else {
-            throw new DataAccessException("500: User not found");
+            throw new ResponseException(500, "User not found");
         }
     }
 
@@ -38,7 +39,7 @@ public class UserDAO {
         users = new ArrayList<>();
     }
 
-    public static ArrayList<GameData> listGames(UserData u) throws DataAccessException {
+    public static ArrayList<GameData> listGames(UserData u) {
         return GameDAO.games;
     }
 

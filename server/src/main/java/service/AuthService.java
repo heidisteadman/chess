@@ -3,11 +3,7 @@ package service;
 import dataaccess.AuthDAO;
 
 public class AuthService {
-    public record ClearAuthRequest() {}
-    public record ClearAuthResponse() {}
-
-    public ClearAuthResponse clearAuth(ClearAuthRequest c) {
+    public static void clearAuth() {
         AuthDAO.clearAuthDB();
-        return new ClearAuthResponse();
     }
 }

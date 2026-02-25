@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
@@ -32,11 +33,11 @@ public class AuthDAO {
         return null;
     }
 
-    public static void deleteAuth(AuthData a) throws DataAccessException{
+    public static void deleteAuth(AuthData a) throws ResponseException {
         if (authTokens.contains(a)) {
             authTokens.remove(a);
         } else {
-            throw new DataAccessException("AuthToken does not exist");
+            throw new ResponseException(400, "AuthToken does not exist");
         }
     }
 
