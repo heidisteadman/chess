@@ -34,11 +34,11 @@ public class UserDAO {
         }
     }
 
-    public void clearUserDB(){
+    public static void clearUserDB(){
         users = new ArrayList<>();
     }
 
-    public List<GameData> listGames(UserData u) throws DataAccessException {
+    public static ArrayList<GameData> listGames(UserData u) throws DataAccessException {
         return GameDAO.games;
     }
 

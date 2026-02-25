@@ -15,6 +15,8 @@ public class UserService {
     public record LoginResponse(String username, String authToken) {}
     public record LogoutRequest(String authToken) {}
     public record LogoutResponse(String message) {}
+    public record ClearUserRequest() {}
+    public record ClearUserResponse() {}
 
     public RegisterResponse register(RegisterRequest r) throws DataAccessException {
         UserData newUser = new UserData(r.username, r.password, r.email);
@@ -49,9 +51,15 @@ public class UserService {
         if (logAuth != null) {
             UserData logUser = UserDAO.getUser(logAuth.getUser());
             UserDAO.deleteUser(logUser);
+            AuthDAO.deleteAuth(logAuth);
             return new LogoutResponse("Logout Success");
         } else {
             throw new DataAccessException("401: Error: Unauthorized");
         }
+    }
+
+    public ClearUserResponse clearUser(ClearUserRequest c) {
+        UserDAO.clearUserDB();
+        return new ClearUserResponse();
     }
 }

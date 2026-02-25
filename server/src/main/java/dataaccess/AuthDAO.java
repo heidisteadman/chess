@@ -32,7 +32,7 @@ public class AuthDAO {
         return null;
     }
 
-    public void deleteAuth(AuthData a) throws DataAccessException{
+    public static void deleteAuth(AuthData a) throws DataAccessException{
         if (authTokens.contains(a)) {
             authTokens.remove(a);
         } else {
