@@ -40,7 +40,7 @@ public class AuthDAO {
         }
     }
 
-    public void clearAuthDB(){
+    public static void clearAuthDB(){
         authTokens = new ArrayList<>();
     }
 }
