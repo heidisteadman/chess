@@ -1,28 +1,32 @@
 package dataaccess;
 
+import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserDAO {
     static ArrayList<UserData> users = new ArrayList<>();
 
-    public void insertUser(UserData u) throws DataAccessException{
+    public static void insertUser(UserData u) {
         users.add(u);
         AuthDAO.createAuth(u);
     }
 
-    public UserData getUser(UserData u) throws DataAccessException{
-        if (users.contains(u)) {
-            return u;
-        } else {
-            throw new DataAccessException("500: User not found");
+    public static UserData getUser(String username) {
+        for (UserData user : users) {
+            String un = user.getUser();
+            if (Objects.equals(un, username)) {
+                return user;
+            }
         }
+        return null;
     }
 
-    public void deleteUser(UserData u) throws DataAccessException{
+    public static void deleteUser(UserData u) throws DataAccessException{
         if (users.contains(u)) {
             users.remove(u);
         } else {
