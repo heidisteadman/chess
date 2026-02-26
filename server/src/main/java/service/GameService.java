@@ -17,8 +17,11 @@ public class GameService {
     public record ListGamesResponse(ArrayList<GameData> gameList) {}
     public record CreateGameRequest(String authToken, String gameName) {}
     public record CreateGameResponse(int gameID) {}
-    public record JoinGameRequest(String authToken, String color, String gameID) {}
+    public record JoinGameRequest(String color, String gameID) {}
     public record JoinGameResponse() {}
+    public record GetAuth(String authToken){
+        public String getToken() {return authToken;}
+    }
 
     public static ListGamesResponse listGames(ListGamesRequest l) throws ResponseException {
         AuthData auth = AuthDAO.findAuth(l.authToken);
@@ -33,19 +36,19 @@ public class GameService {
         return new ListGamesResponse(game);
     }
 
-    public CreateGameResponse createGame(CreateGameRequest c) throws DataAccessException {
-        AuthData auth = AuthDAO.findAuth(c.authToken);
+    public static CreateGameResponse createGame(CreateGameRequest c, String token) throws ResponseException {
+        AuthData auth = AuthDAO.findAuth(token);
         if (auth == null) {
-            throw new DataAccessException("401: Error: Unauthorized");
+            throw new ResponseException(401, "Error: Unauthorized");
         }
         int gameID = GameDAO.createGame(c.gameName);
         return new CreateGameResponse(gameID);
     }
 
-    public JoinGameResponse joinGame(JoinGameRequest j) throws DataAccessException {
-        AuthData auth = AuthDAO.findAuth(j.authToken);
+    public static JoinGameResponse joinGame(JoinGameRequest j, String token) throws ResponseException {
+        AuthData auth = AuthDAO.findAuth(token);
         if (auth == null) {
-            throw new DataAccessException("401: Error: Unauthorized");
+            throw new ResponseException(401, "Error: Unauthorized");
         }
         int gid = Integer.parseInt(j.gameID);
         GameData game = GameDAO.getGame(gid);
@@ -60,7 +63,7 @@ public class GameService {
             GameDAO.updateGame(gid, user, blackUser);
             return new JoinGameResponse();
         } else {
-            throw new DataAccessException("403: Error: Already Taken");
+            throw new ResponseException(403, "Error: Already Taken");
         }
     }
 

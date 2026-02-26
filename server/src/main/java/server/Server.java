@@ -58,4 +58,20 @@ public class Server {
         var res = GameService.listGames(req);
         ctx.result(new Gson().toJson(res));
     }
+
+    private void createGame(Context ctx) throws ResponseException {
+        GameService.CreateGameRequest req = new Gson().fromJson(ctx.body(), GameService.CreateGameRequest.class);
+        GameService.GetAuth auth = new Gson().fromJson(ctx.header("Authorization"), GameService.GetAuth.class);
+        String token = auth.getToken();
+        var res = GameService.createGame(req, token);
+        ctx.result(new Gson().toJson(res));
+    }
+
+    private void joinGame(Context ctx) throws ResponseException {
+        GameService.JoinGameRequest req = new Gson().fromJson(ctx.body(), GameService.JoinGameRequest.class);
+        GameService.GetAuth auth = new Gson().fromJson(ctx.header("Authorization"), GameService.GetAuth.class);
+        String token = auth.getToken();
+        var res = GameService.joinGame(req, token);
+        ctx.result(new Gson().toJson(res));
+    }
 }
