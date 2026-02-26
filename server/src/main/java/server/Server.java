@@ -12,7 +12,15 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        javalin = Javalin.create(config -> config.staticFiles.add("web"))
+                .post("/user", this::register)
+                .delete("/db", this::clear)
+                .post("/session", this::login)
+                .delete("/session", this::logout)
+                .get("/games", this::listGames)
+                .post("/game", this::createGame)
+                .put("/game", this::joinGame)
+                .exception(ResponseException.class, this::exceptionHandler);
 
         // Register your endpoints and exception handlers here.
 
@@ -73,5 +81,10 @@ public class Server {
         String token = auth.getToken();
         var res = GameService.joinGame(req, token);
         ctx.result(new Gson().toJson(res));
+    }
+
+    private void exceptionHandler(ResponseException ex, Context ctx) {
+        ctx.status(ex.getCode());
+        ctx.result(ex.toJson());
     }
 }
