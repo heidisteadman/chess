@@ -56,29 +56,29 @@ public class Server {
     }
 
     private void logout(Context ctx) throws ResponseException {
-        UserService.LogoutRequest req = new Gson().fromJson(ctx.header("Authorization"), UserService.LogoutRequest.class);
+        String token = ctx.header("authorization");
+        UserService.LogoutRequest req = new UserService.LogoutRequest(token);
         var res = UserService.logout(req);
         ctx.result(new Gson().toJson(res));
     }
 
     private void listGames(Context ctx) throws ResponseException {
-        GameService.ListGamesRequest req = new Gson().fromJson(ctx.header("Authorization"), GameService.ListGamesRequest.class);
+        String token = ctx.header("authorization");
+        GameService.ListGamesRequest req = new GameService.ListGamesRequest(token);
         var res = GameService.listGames(req);
         ctx.result(new Gson().toJson(res));
     }
 
     private void createGame(Context ctx) throws ResponseException {
         GameService.CreateGameRequest req = new Gson().fromJson(ctx.body(), GameService.CreateGameRequest.class);
-        GameService.GetAuth auth = new Gson().fromJson(ctx.header("Authorization"), GameService.GetAuth.class);
-        String token = auth.getToken();
+        String token = ctx.header("authorization");
         var res = GameService.createGame(req, token);
         ctx.result(new Gson().toJson(res));
     }
 
     private void joinGame(Context ctx) throws ResponseException {
         GameService.JoinGameRequest req = new Gson().fromJson(ctx.body(), GameService.JoinGameRequest.class);
-        GameService.GetAuth auth = new Gson().fromJson(ctx.header("Authorization"), GameService.GetAuth.class);
-        String token = auth.getToken();
+        String token = ctx.header("authorization");
         var res = GameService.joinGame(req, token);
         ctx.result(new Gson().toJson(res));
     }

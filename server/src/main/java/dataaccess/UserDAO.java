@@ -28,11 +28,7 @@ public class UserDAO {
     }
 
     public static void deleteUser(UserData u) throws ResponseException {
-        if (users.contains(u)) {
-            users.remove(u);
-        } else {
-            throw new ResponseException(500, "User not found");
-        }
+        users.remove(u);
     }
 
     public static void clearUserDB(){

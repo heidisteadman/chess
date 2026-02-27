@@ -33,12 +33,18 @@ public class AuthDAO {
         return null;
     }
 
-    public static void deleteAuth(AuthData a) throws ResponseException {
-        if (authTokens.contains(a)) {
-            authTokens.remove(a);
-        } else {
-            throw new ResponseException(400, "AuthToken does not exist");
+    public static String findAuthUser(String username) {
+        for (AuthData auth : authTokens) {
+            String aUser = auth.getUser();
+            if (Objects.equals(aUser, username)) {
+                return aUser;
+            }
         }
+        return null;
+    }
+
+    public static void deleteAuth(AuthData a) throws ResponseException {
+        authTokens.remove(a);
     }
 
     public static void clearAuthDB(){
