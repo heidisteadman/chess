@@ -5,7 +5,6 @@ import exception.ResponseException;
 import model.GameData;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class GameDAO {
     public static ArrayList<GameData> games = new ArrayList<>();

@@ -1,6 +1,5 @@
 package dataaccess;
 
-import exception.ResponseException;
 import model.GameData;
 import model.UserData;
 
@@ -25,7 +24,7 @@ public class UserDAO {
         return null;
     }
 
-    public static void deleteUser(UserData u) throws ResponseException {
+    public static void deleteUser(UserData u) {
         users.remove(u);
     }
 

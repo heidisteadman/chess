@@ -1,6 +1,5 @@
 package dataaccess;
 
-import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
@@ -17,10 +16,6 @@ public class AuthDAO {
         AuthData newToken = new AuthData(token, user);
         authTokens.add(newToken);
         return newToken;
-    }
-
-    public boolean checkAuth(AuthData a) {
-        return authTokens.contains(a);
     }
 
     public static AuthData findAuth(String token) {
@@ -43,7 +38,7 @@ public class AuthDAO {
         return null;
     }
 
-    public static void deleteAuth(AuthData a) throws ResponseException {
+    public static void deleteAuth(AuthData a) {
         authTokens.remove(a);
     }
 
