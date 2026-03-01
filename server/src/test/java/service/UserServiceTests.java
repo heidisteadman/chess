@@ -1,15 +1,14 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class UserServiceTests {
@@ -23,7 +22,9 @@ public class UserServiceTests {
         expUserList.add(expUser);
 
         Assertions.assertEquals(expUserList, userList);
+        GameService.clearGames();
         UserService.clearUser();
+        AuthService.clearAuth();
 
     }
 
@@ -34,6 +35,9 @@ public class UserServiceTests {
             UserService.register(badReq);
         });
         Assertions.assertEquals("Error: bad request", ex.message());
+        GameService.clearGames();
+        UserService.clearUser();
+        AuthService.clearAuth();
     }
 
     @Test
@@ -44,6 +48,9 @@ public class UserServiceTests {
         UserService.LoginResponse logged = UserService.login(logReq);
 
         Assertions.assertEquals("name", logged.getLoginUser());
+        GameService.clearGames();
+        UserService.clearUser();
+        AuthService.clearAuth();
     }
 
     @Test
@@ -54,6 +61,9 @@ public class UserServiceTests {
         });
 
         Assertions.assertEquals("Error: bad request", ex.message());
+        GameService.clearGames();
+        UserService.clearUser();
+        AuthService.clearAuth();
     }
 
     @Test
@@ -64,6 +74,9 @@ public class UserServiceTests {
         });
 
         Assertions.assertEquals("Error: User does not exist", ex.message());
+        GameService.clearGames();
+        UserService.clearUser();
+        AuthService.clearAuth();
     }
 
     @Test
@@ -77,6 +90,9 @@ public class UserServiceTests {
         });
 
         Assertions.assertEquals("Error: Unauthorized", ex.message());
+        GameService.clearGames();
+        UserService.clearUser();
+        AuthService.clearAuth();
     }
 
     @Test
@@ -93,7 +109,9 @@ public class UserServiceTests {
         UserService.LogoutResponse result = UserService.logout(validLogout);
 
         Assertions.assertInstanceOf(UserService.LogoutResponse.class, result);
-
+        GameService.clearGames();
+        UserService.clearUser();
+        AuthService.clearAuth();
     }
 
     @Test
@@ -104,5 +122,21 @@ public class UserServiceTests {
         });
 
         Assertions.assertEquals("Error: Unauthorized", ex.message());
+        GameService.clearGames();
+        UserService.clearUser();
+        AuthService.clearAuth();
+    }
+
+    @Test
+    public void userClearTest() throws ResponseException {
+        UserService.RegisterRequest newReg = new UserService.RegisterRequest("name", "pass", "email@email.org");
+        UserService.register(newReg);
+        UserService.clearUser();
+        ArrayList<UserData> noUsers = new ArrayList<>();
+
+        Assertions.assertEquals(noUsers, UserDAO.users);
+        GameService.clearGames();
+        UserService.clearUser();
+        AuthService.clearAuth();
     }
 }

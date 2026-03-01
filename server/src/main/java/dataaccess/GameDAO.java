@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class GameDAO {
-    static ArrayList<GameData> games = new ArrayList<>();
+    public static ArrayList<GameData> games = new ArrayList<>();
     private static int gameID = 1000;
 
     public static int createGame(String gameName) throws ResponseException {
@@ -20,14 +20,14 @@ public class GameDAO {
         return newGame.getID();
     }
 
-    public static GameData getGame(int gid) throws ResponseException {
+    public static GameData getGame(int gid) {
         for (GameData game : games) {
             int id = game.getID();
             if (id == gid) {
                 return game;
             }
         }
-        throw new ResponseException(401, "Error: Game not found");
+        return null;
     }
 
     public static void updateGame(int gid, String white, String black) throws ResponseException {
@@ -51,6 +51,7 @@ public class GameDAO {
     }
     public static void clearGameDB(){
         games = new ArrayList<>();
+        gameID = 1000;
     }
 
 }

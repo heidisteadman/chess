@@ -17,7 +17,7 @@ public class Server {
                 .delete("/db", this::clear)
                 .post("/session", this::login)
                 .delete("/session", this::logout)
-                .get("/games", this::listGames)
+                .get("/game", this::listGames)
                 .post("/game", this::createGame)
                 .put("/game", this::joinGame)
                 .exception(ResponseException.class, this::exceptionHandler);
