@@ -1,13 +1,11 @@
 package service;
 
 import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -19,9 +17,7 @@ public class GameService {
     public record CreateGameResponse(int gameID) {}
     public record JoinGameRequest(String color, String gameID) {}
     public record JoinGameResponse() {}
-    public record GetAuth(String authToken){
-        public String getToken() {return authToken;}
-    }
+
 
     public static ListGamesResponse listGames(ListGamesRequest l) throws ResponseException {
         AuthData auth = AuthDAO.findAuth(l.authToken);
@@ -29,9 +25,11 @@ public class GameService {
             throw new ResponseException(401, "Error: Unauthorized");
         }
 
-        String username = auth.getUser();
-        UserData user = UserDAO.getUser(username);
-        ArrayList<GameData> game = UserDAO.listGames(user);
+        ArrayList<GameData> game = UserDAO.listGames();
+        if (game == null) {
+            ArrayList<GameData> games = new ArrayList<>();
+            return new ListGamesResponse(games);
+        }
 
         return new ListGamesResponse(game);
     }

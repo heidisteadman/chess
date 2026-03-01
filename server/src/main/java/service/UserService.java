@@ -6,15 +6,24 @@ import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class UserService {
     public record RegisterRequest(String username, String password, String email) {}
     public record RegisterResponse(String username, String authToken) {}
     public record LoginRequest(String username, String password) {}
-    public record LoginResponse(String username, String authToken) {}
+    public record LoginResponse(String username, String authToken) {
+        public String getLoginUser() {
+            return username;
+        }
+    }
     public record LogoutRequest(String authToken) {}
     public record LogoutResponse() {}
+
+    public static ArrayList<UserData> getUsers() {
+        return UserDAO.users;
+    }
 
     public static RegisterResponse register(RegisterRequest r) throws ResponseException {
         if ((r.username == null) || (r.password == null) || (r.email == null)) {

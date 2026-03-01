@@ -1,16 +1,14 @@
 package dataaccess;
 
 import exception.ResponseException;
-import model.AuthData;
 import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class UserDAO {
-    static ArrayList<UserData> users = new ArrayList<>();
+    public static ArrayList<UserData> users = new ArrayList<>();
 
     public static void insertUser(UserData u) {
         users.add(u);
@@ -35,7 +33,7 @@ public class UserDAO {
         users = new ArrayList<>();
     }
 
-    public static ArrayList<GameData> listGames(UserData u) {
+    public static ArrayList<GameData> listGames() {
         return GameDAO.games;
     }
 

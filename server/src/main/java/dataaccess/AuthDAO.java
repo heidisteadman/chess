@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class AuthDAO {
-    static ArrayList<AuthData> authTokens = new ArrayList<>();
+    public static ArrayList<AuthData> authTokens = new ArrayList<>();
 
     public static AuthData createAuth(UserData a) {
         String token = UUID.randomUUID().toString();
@@ -37,7 +37,7 @@ public class AuthDAO {
         for (AuthData auth : authTokens) {
             String aUser = auth.getUser();
             if (Objects.equals(aUser, username)) {
-                return aUser;
+                return auth.getToken();
             }
         }
         return null;
