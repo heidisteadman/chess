@@ -29,6 +29,20 @@ public interface SQLDAO {
             """
     };
 
+    String[] CREATE_GAMES = {
+            """
+            CREATE TABLE IF NOT EXISTS games (
+            `gameID` INT NOT NULL AUTO_INCREMENT,
+            `whiteUser` varchar(255),
+            `blackUser` varchar(255),
+            `gameName` varchar(255),
+            `game` TEXT NOT NULL,
+            PRIMARY KEY (`gameID`),
+            INDEX (`gameName`)
+            ) AUTO_INCREMENT=1000 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
+
     static void configureDatabase(String [] createStatement) throws ResponseException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
