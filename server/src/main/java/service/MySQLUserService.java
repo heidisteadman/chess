@@ -9,6 +9,11 @@ import model.UserData;
 import java.util.Objects;
 
 public class MySQLUserService {
+    public MySQLUserService(MySQLUserDAO userDAO, MySQLAuthDAO authDAO) {
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
+    }
+
     public record RegisterRequest(String username, String password, String email) {}
     public record RegisterResponse(String username, String authToken) {}
     public record LoginRequest(String username, String password) {}
@@ -16,8 +21,8 @@ public class MySQLUserService {
     public record LogoutRequest(String authToken) {}
     public record LogoutResponse() {}
 
-    private MySQLUserDAO userDAO;
-    private MySQLAuthDAO authDAO;
+    private final MySQLUserDAO userDAO;
+    private final MySQLAuthDAO authDAO;
 
     public RegisterResponse register(RegisterRequest r) throws ResponseException {
         if ((r.username == null) || (r.password == null) || (r.email == null)) {

@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class MySQLGameService {
+    public MySQLGameService(MySQLGameDAO gameDAO, MySQLAuthDAO authDAO) {
+        this.gameDAO = gameDAO;
+        this.authDAO = authDAO;
+    }
+
     public record ListGamesRequest(String authToken) {}
     public record ListGamesResponse(ArrayList<GameData> games) {}
     public record CreateGameRequest(String gameName) {}
@@ -16,8 +21,8 @@ public class MySQLGameService {
     public record JoinGameRequest(String playerColor, String gameID) {}
     public record JoinGameResponse() {}
 
-    private MySQLGameDAO gameDAO;
-    private MySQLAuthDAO authDAO;
+    private final MySQLGameDAO gameDAO;
+    private final MySQLAuthDAO authDAO;
 
     public ListGamesResponse listGames(ListGamesRequest l) throws ResponseException {
         AuthData auth = authDAO.findAuth(l.authToken);
