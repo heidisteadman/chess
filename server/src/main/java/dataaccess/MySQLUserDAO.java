@@ -15,12 +15,13 @@ public class MySQLUserDAO implements SQLUserDAO, SQLDAO{
         SQLDAO.executeUpdate(state);
     }
 
-    public UserData insertUser(String username, String password, String email) throws ResponseException {
+    public void insertUser(UserData u) throws ResponseException {
+        String username = u.getUser();
+        String password = u.getPassword();
+        String email = u.email();
         String state = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         String hashPass = BCrypt.hashpw(password, BCrypt.gensalt());
         SQLDAO.executeUpdate(state, username, hashPass, email);
-        return new UserData(username, password, email);
-
     }
 
     public void deleteUser(UserData u) throws ResponseException {
@@ -29,7 +30,7 @@ public class MySQLUserDAO implements SQLUserDAO, SQLDAO{
         SQLDAO.executeUpdate(state, user);
     }
 
-    public UserData findUser(String username) throws ResponseException {
+    public UserData getUser(String username) throws ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT username, password, email FROM users WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {

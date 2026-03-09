@@ -38,14 +38,15 @@ public class MySQLAuthDAO implements SQLAuthDAO, SQLDAO{
         }
     }
 
-    public AuthData findAuthUser(String username) throws ResponseException {
+    public String findAuthUser(String username) throws ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String state = "SELECT username, authToken FROM auths WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(state)) {
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return readAuth(rs);
+                        AuthData auth = readAuth(rs);
+                        return auth.authToken();
                     } else {
                         return null;
                     }
