@@ -1,15 +1,49 @@
 package server;
 
+import dataaccess.MySQLAuthDAO;
+import dataaccess.MySQLGameDAO;
+import dataaccess.MySQLUserDAO;
 import io.javalin.*;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import exception.ResponseException;
-import service.GameService;
-import service.UserService;
+import service.MySQLGameService;
+import service.MySQLUserService;
+import service.MySQLAuthService;
 
 public class Server {
 
     private final Javalin javalin;
+    private final MySQLUserDAO userDAO;
+    {
+        try {
+            userDAO = new MySQLUserDAO();
+        } catch (ResponseException re) {
+            throw new RuntimeException(re);
+        }
+    }
+
+    private final MySQLGameDAO gameDAO;
+    {
+        try {
+            gameDAO = new MySQLGameDAO();
+        } catch (ResponseException re) {
+            throw new RuntimeException(re);
+        }
+    }
+
+    private final MySQLAuthDAO authDAO;
+    {
+        try {
+            authDAO = new MySQLAuthDAO();
+        } catch (ResponseException re) {
+            throw new RuntimeException(re);
+        }
+    }
+
+    private final MySQLUserService userService = new MySQLUserService(userDAO, authDAO);
+    private final MySQLGameService gameService = new MySQLGameService(gameDAO, authDAO);
+    private final MySQLAuthService authService = new MySQLAuthService(authDAO);
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
@@ -36,50 +70,50 @@ public class Server {
         javalin.stop();
     }
 
-    private void clear(Context ctx) {
-        service.AuthService.clearAuth();
-        service.UserService.clearUser();
-        service.GameService.clearGames();
+    private void clear(Context ctx) throws ResponseException {
+        authService.clear();
+        userService.clear();
+        gameService.clear();
         ctx.status(200);
     }
 
     private void register(Context ctx) throws ResponseException {
-        UserService.RegisterRequest reg = new Gson().fromJson(ctx.body(), UserService.RegisterRequest.class);
-        var res = UserService.register(reg);
+        MySQLUserService.RegisterRequest reg = new Gson().fromJson(ctx.body(), MySQLUserService.RegisterRequest.class);
+        var res = userService.register(reg);
         ctx.result(new Gson().toJson(res));
     }
 
     private void login(Context ctx) throws ResponseException {
-        UserService.LoginRequest req = new Gson().fromJson(ctx.body(), UserService.LoginRequest.class);
-        var res = UserService.login(req);
+        MySQLUserService.LoginRequest req = new Gson().fromJson(ctx.body(), MySQLUserService.LoginRequest.class);
+        var res = userService.login(req);
         ctx.result(new Gson().toJson(res));
     }
 
     private void logout(Context ctx) throws ResponseException {
         String token = ctx.header("authorization");
-        UserService.LogoutRequest req = new UserService.LogoutRequest(token);
-        var res = UserService.logout(req);
+        MySQLUserService.LogoutRequest req = new MySQLUserService.LogoutRequest(token);
+        var res = userService.logout(req);
         ctx.result(new Gson().toJson(res));
     }
 
     private void listGames(Context ctx) throws ResponseException {
         String token = ctx.header("authorization");
-        GameService.ListGamesRequest req = new GameService.ListGamesRequest(token);
-        var res = GameService.listGames(req);
+        MySQLGameService.ListGamesRequest req = new MySQLGameService.ListGamesRequest(token);
+        var res = gameService.listGames(req);
         ctx.result(new Gson().toJson(res));
     }
 
     private void createGame(Context ctx) throws ResponseException {
-        GameService.CreateGameRequest req = new Gson().fromJson(ctx.body(), GameService.CreateGameRequest.class);
+        MySQLGameService.CreateGameRequest req = new Gson().fromJson(ctx.body(), MySQLGameService.CreateGameRequest.class);
         String token = ctx.header("authorization");
-        var res = GameService.createGame(req, token);
+        var res = gameService.createGame(req, token);
         ctx.result(new Gson().toJson(res));
     }
 
     private void joinGame(Context ctx) throws ResponseException {
-        GameService.JoinGameRequest req = new Gson().fromJson(ctx.body(), GameService.JoinGameRequest.class);
+        MySQLGameService.JoinGameRequest req = new Gson().fromJson(ctx.body(), MySQLGameService.JoinGameRequest.class);
         String token = ctx.header("authorization");
-        var res = GameService.joinGame(req, token);
+        var res = gameService.joinGame(req, token);
         ctx.result(new Gson().toJson(res));
     }
 
