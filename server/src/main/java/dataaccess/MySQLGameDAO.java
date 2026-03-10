@@ -14,13 +14,13 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
 
     public int createGame(String gameName) throws ResponseException {
         ChessGame newGame = new ChessGame();
-        String state = "INSERT INTO games (whiteUser, blackUser, gameName, game VALUES (?, ?, ?, ?)";
+        String state = "INSERT INTO games (whiteUser, blackUser, gameName, game) VALUES (?, ?, ?, ?)";
         var jsonGame = new Gson().toJson(newGame);
         return SQLDAO.executeUpdate(state, "", "", gameName, jsonGame);
     }
 
     public ArrayList<GameData> listGames() throws ResponseException {
-        String state = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM games";
+        String state = "SELECT gameID, whiteUser, blackUser, gameName, game FROM games";
         ArrayList<GameData> gameList = new ArrayList<>();
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(state)) {
@@ -64,6 +64,13 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
         if (white == null) {
             String state = "UPDATE games SET blackUser=? WHERE gameID=?";
             SQLDAO.executeUpdate(state, black, gameID);
+        }
+
+        if ((white != null) && (black != null)) {
+            String state = "UPDATE games SET whiteUser=? WHERE gameID=?";
+            String state2 = "UPDATE games SET blackUser=? WHERE gameID=?";
+            SQLDAO.executeUpdate(state, white, gameID);
+            SQLDAO.executeUpdate(state2, black, gameID);
         }
     }
 

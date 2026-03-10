@@ -27,7 +27,7 @@ public class MySQLGameService {
     public ListGamesResponse listGames(ListGamesRequest l) throws ResponseException {
         AuthData auth = authDAO.findAuth(l.authToken);
         if (auth == null) {
-            throw new ResponseException(401, "Error: Unauthorized");
+            throw new ResponseException(401, "Error: Unauthorized list games request");
         }
 
         ArrayList<GameData> game = gameDAO.listGames();
@@ -53,7 +53,7 @@ public class MySQLGameService {
     public JoinGameResponse joinGame(JoinGameRequest j, String token) throws ResponseException {
         AuthData auth = authDAO.findAuth(token);
         if (auth == null) {
-            throw new ResponseException(401, "Error: Unauthorized");
+            throw new ResponseException(401, "Error: Unauthorized join game request");
         }
 
         if (j.gameID == null) {
@@ -72,10 +72,10 @@ public class MySQLGameService {
         String user = auth.getUser();
 
         if (Objects.equals(j.playerColor, "BLACK") && (blackUser == null)) {
-            GameDAO.updateGame(gid, whiteUser, user);
+            gameDAO.joinGame(gid, whiteUser, user);
             return new MySQLGameService.JoinGameResponse();
         } else if (Objects.equals(j.playerColor, "WHITE") && (whiteUser == null)) {
-            GameDAO.updateGame(gid, user, blackUser);
+            gameDAO.joinGame(gid, user, blackUser);
             return new MySQLGameService.JoinGameResponse();
         } else if (!(Objects.equals(j.playerColor, "BLACK")) && !(Objects.equals(j.playerColor, "WHITE"))) {
             throw new ResponseException(400, "Error: bad request");

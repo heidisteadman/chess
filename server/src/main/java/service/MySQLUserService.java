@@ -5,6 +5,7 @@ import dataaccess.MySQLUserDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 
@@ -32,7 +33,12 @@ public class MySQLUserService {
         UserData findUser = userDAO.getUser(r.username);
         if (findUser == null) {
             userDAO.insertUser(newUser);
-            String token = authDAO.findAuthUser(r.username);
+            authDAO.createAuth(newUser);
+            AuthData authd = authDAO.findAuthUser(r.username);
+            if (authd == null) {
+                throw new ResponseException(401, "Error: unauthorized register request");
+            }
+            String token = authd.getToken();
             return new MySQLUserService.RegisterResponse(r.username, token);
         } else {
             throw new ResponseException(403, "Error: Already Taken");
@@ -45,14 +51,15 @@ public class MySQLUserService {
         }
         UserData logUser = userDAO.getUser(l.username);
         if (logUser != null) {
-            String pass = l.password;
-            String upass = logUser.getPassword();
-            if (Objects.equals(pass, upass)) {
+            String upass = l.password;
+            String hashpass = logUser.getPassword();
+
+            if (BCrypt.checkpw(upass, hashpass)) {
                 AuthData tokenData = authDAO.createAuth(logUser);
                 String token = tokenData.getToken();
                 return new MySQLUserService.LoginResponse(l.username, token);
             } else {
-                throw new ResponseException(401, "Error: Unauthorized");
+                throw new ResponseException(401, "Error: Unauthorized login request");
             }
         } else {
             throw new ResponseException(401, "Error: User does not exist");
@@ -62,12 +69,10 @@ public class MySQLUserService {
     public LogoutResponse logout(LogoutRequest l) throws ResponseException {
         AuthData logAuth = authDAO.findAuth(l.authToken);
         if (logAuth != null) {
-            UserData logUser = userDAO.getUser(logAuth.getUser());
-            userDAO.deleteUser(logUser);
             authDAO.deleteAuth(logAuth);
             return new MySQLUserService.LogoutResponse();
         } else {
-            throw new ResponseException(401, "Error: Unauthorized");
+            throw new ResponseException(401, "Error: Unauthorized logout request");
         }
     }
 

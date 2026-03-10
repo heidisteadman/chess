@@ -22,6 +22,7 @@ public class MySQLUserDAO implements SQLUserDAO, SQLDAO{
         String state = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
         String hashPass = BCrypt.hashpw(password, BCrypt.gensalt());
         SQLDAO.executeUpdate(state, username, hashPass, email);
+
     }
 
     public void deleteUser(UserData u) throws ResponseException {

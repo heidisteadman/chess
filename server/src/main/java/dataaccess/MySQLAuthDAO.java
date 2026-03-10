@@ -38,15 +38,14 @@ public class MySQLAuthDAO implements SQLAuthDAO, SQLDAO{
         }
     }
 
-    public String findAuthUser(String username) throws ResponseException {
+    public AuthData findAuthUser(String username) throws ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String state = "SELECT username, authToken FROM auths WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(state)) {
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        AuthData auth = readAuth(rs);
-                        return auth.authToken();
+                        return readAuth(rs);
                     } else {
                         return null;
                     }
@@ -58,9 +57,9 @@ public class MySQLAuthDAO implements SQLAuthDAO, SQLDAO{
     }
 
     public void deleteAuth(AuthData a) throws ResponseException {
-        String username = a.getUser();
-        String state = "DELETE FROM auths WHERE username=?";
-        SQLDAO.executeUpdate(state, username);
+        String token = a.getToken();
+        String state = "DELETE FROM auths WHERE authToken=?";
+        SQLDAO.executeUpdate(state, token);
     }
 
     public void clear() throws ResponseException {
