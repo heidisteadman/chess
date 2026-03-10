@@ -45,7 +45,7 @@ public class MySQLUserDAO implements SQLUserDAO, SQLDAO{
                 }
             }
         } catch (SQLException | DataAccessException sqlex) {
-            throw new ResponseException(500, "failed to get user from database");
+            throw new ResponseException(500, "Error: failed to get user from database");
         }
     }
 

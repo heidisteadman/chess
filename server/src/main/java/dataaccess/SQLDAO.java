@@ -52,7 +52,7 @@ public interface SQLDAO {
                 }
             }
         } catch (SQLException | DataAccessException sqlex) {
-            throw new ResponseException(500, "failed to configure the database");
+            throw new ResponseException(500, "Error: failed to configure the database");
         }
     }
 
@@ -74,7 +74,7 @@ public interface SQLDAO {
                 return 0;
             }
         } catch (SQLException | DataAccessException e) {
-            throw new ResponseException (500, "Unable to access database");
+            throw new ResponseException (500, "Error: Unable to access database");
         }
     }
 

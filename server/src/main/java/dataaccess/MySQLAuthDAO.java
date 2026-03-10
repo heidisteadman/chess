@@ -34,7 +34,7 @@ public class MySQLAuthDAO implements SQLAuthDAO, SQLDAO{
                 }
             }
         } catch (SQLException | DataAccessException sqex) {
-            throw new ResponseException(500, "failed to find auth data");
+            throw new ResponseException(500, "Error: failed to find auth data");
         }
     }
 
@@ -52,7 +52,7 @@ public class MySQLAuthDAO implements SQLAuthDAO, SQLDAO{
                 }
             }
         } catch (SQLException | DataAccessException sqlex) {
-            throw new ResponseException(500, "failed to find auth data");
+            throw new ResponseException(500, "Error: failed to find auth data");
         }
     }
 

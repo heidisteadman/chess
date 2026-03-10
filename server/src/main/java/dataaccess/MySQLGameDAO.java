@@ -32,7 +32,7 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
                 }
             }
         } catch (SQLException | DataAccessException sqlex) {
-            throw new ResponseException(500, "failed to get games from database");
+            throw new ResponseException(500, "Error: failed to get games from database");
         }
         return gameList;
     }
@@ -51,7 +51,7 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
                 }
             }
         } catch (SQLException | DataAccessException sqlex ) {
-            throw new ResponseException(500, "failed to get game from database");
+            throw new ResponseException(500, "Error: failed to get game from database");
         }
     }
 
