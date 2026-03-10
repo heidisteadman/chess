@@ -25,12 +25,6 @@ public class MySQLUserDAO implements SQLUserDAO, SQLDAO{
 
     }
 
-    public void deleteUser(UserData u) throws ResponseException {
-        String user = u.getUser();
-        String state = "DELETE FROM users WHERE username=?";
-        SQLDAO.executeUpdate(state, user);
-    }
-
     public UserData getUser(String username) throws ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             String statement = "SELECT username, password, email FROM users WHERE username=?";

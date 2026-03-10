@@ -13,6 +13,10 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
     }
 
     public int createGame(String gameName) throws ResponseException {
+        if (gameName == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
+
         ChessGame newGame = new ChessGame();
         String state = "INSERT INTO games (whiteUser, blackUser, gameName, game) VALUES (?, ?, ?, ?)";
         var jsonGame = new Gson().toJson(newGame);
@@ -72,17 +76,12 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
             SQLDAO.executeUpdate(state, white, gameID);
             SQLDAO.executeUpdate(state2, black, gameID);
         }
+
+        if ((white == null) && (black == null)) {
+            throw new ResponseException(400, "Error: bad request");
+        }
     }
 
-    public void updateGame(int gameID, String game) throws ResponseException {
-        String state = "UPDATE games SET game=? WHERE gameID=?";
-        SQLDAO.executeUpdate(state, game, gameID);
-    }
-
-    public void deleteGame(int gameID) throws ResponseException {
-        String state = "DELETE FROM games WHERE gameID=?";
-        SQLDAO.executeUpdate(state, gameID);
-    }
 
     public void clear() throws ResponseException {
         String state = "TRUNCATE games";

@@ -13,6 +13,10 @@ public class MySQLAuthDAO implements SQLAuthDAO, SQLDAO{
 
     public AuthData createAuth(UserData u) throws ResponseException {
         String token = UUID.randomUUID().toString();
+        if ((u == null) || (u.getUser() == null)) {
+            throw new ResponseException(400, "bad request");
+        }
+
         String user = u.getUser();
         AuthData newToken = new AuthData(token, user);
         String state = "INSERT INTO auths (username, authToken) VALUES (?, ?)";
