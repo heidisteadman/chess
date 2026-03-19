@@ -1,7 +1,8 @@
 package client;
 
+import exception.ResponseException;
 import server.ServerFacade;
-
+import model.UserData;
 import java.util.Objects;
 
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
@@ -21,7 +22,15 @@ public class PreloginClient implements ChessClient{
             return help();
         }
 
-        return "nothin' yet";
+        var inputs = in.split(" ");
+        if (Objects.equals(inputs[0], "register")) {
+            return register(in);
+        } else if (Objects.equals(inputs[0], "login")) {
+            return login(in);
+        } else {
+            return "Invalid input. Type `help` for your options.";
+        }
+
     }
 
     public String help() {
@@ -32,5 +41,38 @@ public class PreloginClient implements ChessClient{
                 - Help "help"
                 - Quit "quit"
                 """;
+    }
+
+    private String register(String in) {
+        var inputs = in.split(" ");
+        if (inputs.length != 4) {
+            return "Enter a username, password, and email.";
+        }
+        String user = inputs[1];
+        String pass = inputs[2];
+        String email = inputs[3];
+        UserData u = new UserData(user, pass, email);
+        try {
+            UserData logged = server.register(u);
+            return ("Success! You are logged in as " + logged.username());
+        } catch (ResponseException x) {
+            return ("Unable to register. " + x.getMessage());
+        }
+    }
+
+    private String login(String in) {
+        var inputs = in.split(" ");
+        if (inputs.length != 3) {
+            return "Enter a username and a password.";
+        }
+        String user = inputs[1];
+        String pass = inputs[2];
+        UserData u = new UserData(user, pass, "");
+        try {
+            UserData logged = server.login(u);
+            return ("Success! You logged in as " + logged.username());
+        } catch (ResponseException x) {
+            return ("Unable to log in. " + x.getMessage());
+        }
     }
 }

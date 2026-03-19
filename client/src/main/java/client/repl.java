@@ -31,6 +31,10 @@ public class repl {
 
             try {
                 result = client.eval(line);
+                if (result.contains("You logged in")) {
+                    state = State.SIGNEDIN;
+                }
+                System.out.println(result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.println(msg);
