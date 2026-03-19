@@ -1,7 +1,9 @@
 package client;
 
-import ui.EscapeSequences;
+import java.util.Objects;
+import java.util.Scanner;
 
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class repl {
@@ -20,7 +22,31 @@ public class repl {
         ChessClient client = prelog;
         System.out.println(SET_TEXT_COLOR_BLUE + "Welcome to Chess. Choose an option to start.");
         System.out.println(SET_TEXT_COLOR_BLUE + client.help());
+
+        Scanner scanner = new Scanner(System.in);
+        var result = "";
+        while (!Objects.equals(result, "quit")) {
+            printPrompt();
+            String line = scanner.nextLine();
+
+            try {
+                result = client.eval(line);
+            } catch (Throwable e) {
+                var msg = e.toString();
+                System.out.println(msg);
+            }
+        }
+        System.out.println();
     }
 
+    private void printPrompt() {
+        String stateString;
+        switch (state) {
+            case SIGNEDIN -> stateString = "SIGNED IN";
+            case GAMEPLAY -> stateString = "GAMEPLAY";
+            default -> stateString = "SIGNED OUT";
+        }
+        System.out.println("\n" + RESET_TEXT_COLOR + stateString + " >>> ");
+    }
 
 }
