@@ -1,5 +1,23 @@
 package client;
 
-public class GamePlayClient {
-    public GamePlayClient(String serverURL) {}
+import server.ServerFacade;
+
+public class GamePlayClient implements ChessClient {
+    private final ServerFacade server;
+
+    public GamePlayClient(String serverURL) {
+        server = new ServerFacade(serverURL);
+    }
+
+    public String eval(String in) {
+        return "nothin' yet";
+    }
+
+    public String help() {
+        return """
+                Options:
+                - Quit "quit"
+                - Help "help"
+                """;
+    }
 }

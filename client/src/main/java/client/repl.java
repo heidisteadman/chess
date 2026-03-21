@@ -31,8 +31,15 @@ public class repl {
 
             try {
                 result = client.eval(line);
-                if (result.contains("You logged in")) {
+                if (result.contains("You logged in") || result.contains("Game created") || result.contains("Here are")) {
                     state = State.SIGNEDIN;
+                    client = postlog;
+                } else if (result.contains("logged out")) {
+                    state = State.SIGNEDOUT;
+                    client = prelog;
+                } else if (result.contains("Switching to Game")) {
+                    state = State.GAMEPLAY;
+                    client = gameplay;
                 }
                 System.out.println(result);
             } catch (Throwable e) {

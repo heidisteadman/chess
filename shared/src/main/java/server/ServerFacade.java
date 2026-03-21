@@ -7,11 +7,12 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import model.*;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.net.*;
+import java.net.*;import java.util.Objects;
 
 public class ServerFacade {
     private final String serverURL;
     private HttpClient client = HttpClient.newHttpClient();
+    private record JoinGameRequest(String color, String gameID) {}
 
     public ServerFacade(String url) {
         this.serverURL = url;
@@ -31,6 +32,32 @@ public class ServerFacade {
 
     public void logout() throws ResponseException {
         var request = buildRequest("DELETE", "/session", null);
+        sendRequest(request);
+    }
+
+    public int create(String gameName) throws ResponseException {
+        var request = buildRequest("POST", "/game", gameName);
+        var response = sendRequest(request);
+        String gameIDres = handleResponse(response, String.class);
+        if (Objects.equals(gameIDres, null)) {
+            return(1);
+        }
+        try {
+            return Integer.parseInt(gameIDres);
+        } catch (Exception e) {
+            return (2);
+        }
+    }
+
+    public GameList listGames() throws ResponseException {
+        var request = buildRequest("GET", "/games", null);
+        var response = sendRequest(request);
+        return handleResponse(response, GameList.class);
+    }
+
+    public void joinGame(String color, String gameID) throws ResponseException {
+        JoinGameRequest join = new JoinGameRequest(color, gameID);
+        var request = buildRequest("PUT", "/game", join);
         sendRequest(request);
     }
 
