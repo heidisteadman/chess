@@ -31,10 +31,10 @@ public class repl {
 
             try {
                 result = client.eval(line);
-                if (result.contains("You logged in") || result.contains("Game created") || result.contains("Here are")) {
+                if (result.contains("logged in") || result.contains("Game created") || result.contains("Here are")) {
                     state = State.SIGNEDIN;
                     client = postlog;
-                } else if (result.contains("logged out")) {
+                } else if (result.contains("logged out") || result.contains("Database cleared")) {
                     state = State.SIGNEDOUT;
                     client = prelog;
                 } else if (result.contains("Switching to Game")) {

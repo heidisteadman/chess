@@ -7,27 +7,45 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import model.*;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.net.*;import java.util.Objects;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class ServerFacade {
     private final String serverURL;
     private HttpClient client = HttpClient.newHttpClient();
     private record JoinGameRequest(String color, String gameID) {}
+    private static String authToken;
+    private record CreateGameResponse(int gameID) {}
+    private record CreateGameRequest(String gameName) {}
+    private record ListGameResponse(ArrayList<GameData> games) {}
 
     public ServerFacade(String url) {
         this.serverURL = url;
     }
 
-    public UserData register(UserData u) throws ResponseException {
+    public AuthData register(UserData u) throws ResponseException {
         var request = buildRequest("POST", "/user", u);
         var response = sendRequest(request);
-        return handleResponse(response, UserData.class);
+        AuthData user = handleResponse(response, AuthData.class);
+        if (user != null) {
+            authToken = user.getToken();
+        } else {
+            throw new ResponseException(500, "Failed to get token");
+        }
+        return user;
     }
 
-    public UserData login(UserData u) throws ResponseException {
+    public AuthData login(UserData u) throws ResponseException {
         var request = buildRequest("POST", "/session", u);
         var response = sendRequest(request);
-        return handleResponse(response, UserData.class);
+        AuthData user = handleResponse(response, AuthData.class);
+        if (user != null) {
+            authToken = user.getToken();
+        } else {
+            throw new ResponseException(500, "Failed to get token");
+        }
+        return user;
     }
 
     public void logout() throws ResponseException {
@@ -35,24 +53,27 @@ public class ServerFacade {
         sendRequest(request);
     }
 
-    public int create(String gameName) throws ResponseException {
-        var request = buildRequest("POST", "/game", gameName);
+    public int createGame(String gameName) throws ResponseException {
+        CreateGameRequest req = new CreateGameRequest(gameName);
+        var request = buildRequest("POST", "/game", req);
         var response = sendRequest(request);
-        String gameIDres = handleResponse(response, String.class);
-        if (Objects.equals(gameIDres, null)) {
-            return(1);
-        }
-        try {
-            return Integer.parseInt(gameIDres);
-        } catch (Exception e) {
-            return (2);
+        CreateGameResponse gameIDres = handleResponse(response, CreateGameResponse.class);
+        if (gameIDres != null) {
+            return gameIDres.gameID;
+        } else {
+            throw new ResponseException(500, "did not create game");
         }
     }
 
-    public GameList listGames() throws ResponseException {
-        var request = buildRequest("GET", "/games", null);
+    public ArrayList<GameData> listGames() throws ResponseException {
+        var request = buildRequest("GET", "/game", null);
         var response = sendRequest(request);
-        return handleResponse(response, GameList.class);
+        ListGameResponse res = handleResponse(response, ListGameResponse.class);
+        if (res != null) {
+            return res.games;
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public void joinGame(String color, String gameID) throws ResponseException {
@@ -61,10 +82,18 @@ public class ServerFacade {
         sendRequest(request);
     }
 
+    public void clear() throws ResponseException {
+        var request = buildRequest("DELETE", "/db", null);
+        sendRequest(request);
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverURL+path))
                 .method(method, makeRequestBody(body));
+        if (authToken != null) {
+            request.setHeader("authorization", authToken);
+        }
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
         }

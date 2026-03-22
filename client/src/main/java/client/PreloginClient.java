@@ -1,6 +1,7 @@
 package client;
 
 import exception.ResponseException;
+import model.AuthData;
 import server.ServerFacade;
 import model.UserData;
 import java.util.Objects;
@@ -53,7 +54,7 @@ public class PreloginClient implements ChessClient{
         String email = inputs[3];
         UserData u = new UserData(user, pass, email);
         try {
-            UserData logged = server.register(u);
+            AuthData logged = server.register(u);
             return ("Success! You are logged in as " + logged.username());
         } catch (ResponseException x) {
             return ("Unable to register. " + x.getMessage());
@@ -69,7 +70,7 @@ public class PreloginClient implements ChessClient{
         String pass = inputs[2];
         UserData u = new UserData(user, pass, "");
         try {
-            UserData logged = server.login(u);
+            AuthData logged = server.login(u);
             return ("Success! You logged in as " + logged.username());
         } catch (ResponseException x) {
             return ("Unable to log in. " + x.getMessage());

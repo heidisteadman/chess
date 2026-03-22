@@ -1,9 +1,11 @@
 package client;
 
 import exception.ResponseException;
+import model.GameData;
 import model.GameList;
 import server.ServerFacade;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class PostloginClient implements ChessClient{
@@ -31,6 +33,8 @@ public class PostloginClient implements ChessClient{
             return joinGame(in);
         } else if (Objects.equals(inputs[0], "observe")) {
             return observe(in);
+        } else if (Objects.equals(inputs[0], "clear")) {
+            return clear();
         }
 
         return "Invalid. Type help to see possible commands.";
@@ -66,14 +70,8 @@ public class PostloginClient implements ChessClient{
 
         String gameName = inputs[1];
         try {
-            int gameID = server.create(gameName);
-            if (gameID == 1) {
-                return "Unable to create a gameID. Try again.";
-            } else if (gameID == 2) {
-                return "Did not create a gameID. Try again.";
-            } else {
-                return ("Success! Game created. Game ID: " + gameID);
-            }
+            int gameID = server.createGame(gameName);
+            return ("Success! Game created. Game ID: " + gameID);
         } catch (ResponseException x) {
             return ("Failed to create game. " + x.getMessage());
         }
@@ -81,7 +79,7 @@ public class PostloginClient implements ChessClient{
 
     private String listGames() {
         try {
-            GameList games = server.listGames();
+            ArrayList<GameData> games = server.listGames();
             String listGame = games.toString();
             return ("Success! Here are the games: " + listGame);
         } catch (ResponseException x) {
@@ -118,6 +116,15 @@ public class PostloginClient implements ChessClient{
             return "Success! You have joined the game.";
         } catch (ResponseException x) {
             return ("Failed to join the game. " + x.getMessage());
+        }
+    }
+
+    private String clear() {
+        try {
+            server.clear();
+            return ("Database cleared. Logging out.");
+        } catch (ResponseException x) {
+            return ("Failed to clear database. " + x.getMessage());
         }
     }
 
