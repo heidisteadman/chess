@@ -1,6 +1,7 @@
 package server;
 
-import com.google.gson.Gson;import exception.ResponseException;
+import com.google.gson.Gson;
+import exception.ResponseException;
 import java.net.URI;
 import java.net.http.*;
 import java.net.http.HttpRequest.BodyPublisher;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 
 public class ServerFacade {
     private final String serverURL;
-    private HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient client = HttpClient.newHttpClient();
     private record JoinGameRequest(String color, String gameID) {}
     private static String authToken;
     private record CreateGameResponse(int gameID) {}
@@ -26,7 +27,13 @@ public class ServerFacade {
     public AuthData register(UserData u) throws ResponseException {
         var request = buildRequest("POST", "/user", u);
         var response = sendRequest(request);
-        AuthData user = handleResponse(response, AuthData.class);
+        AuthData user;
+        try {
+            user = handleResponse(response, AuthData.class);
+        } catch (ResponseException x) {
+            throw new ResponseException(403, "Username already taken");
+        }
+
         if (user != null) {
             authToken = user.getToken();
         } else {
@@ -38,7 +45,13 @@ public class ServerFacade {
     public AuthData login(UserData u) throws ResponseException {
         var request = buildRequest("POST", "/session", u);
         var response = sendRequest(request);
-        AuthData user = handleResponse(response, AuthData.class);
+        AuthData user;
+        try {
+            user = handleResponse(response, AuthData.class);
+        } catch (ResponseException x) {
+            throw new ResponseException(401, "Error: Incorrect username or password.");
+        }
+
         if (user != null) {
             authToken = user.getToken();
         } else {
@@ -77,8 +90,13 @@ public class ServerFacade {
 
     public void joinGame(String color, String gameID) throws ResponseException {
         JoinGameRequest join = new JoinGameRequest(color, gameID);
-        var request = buildRequest("PUT", "/game", join);
-        sendRequest(request);
+        try {
+            var request = buildRequest("PUT", "/game", join);
+            sendRequest(request);
+        } catch (ResponseException x) {
+            throw new ResponseException(500, "Enter a valid gameID and team color.");
+        }
+
     }
 
     public void clear() throws ResponseException {

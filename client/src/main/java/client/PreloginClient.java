@@ -57,7 +57,11 @@ public class PreloginClient implements ChessClient{
             AuthData logged = server.register(u);
             return ("Success! You are logged in as " + logged.username());
         } catch (ResponseException x) {
-            return ("Unable to register. " + x.getMessage());
+            if (x.getCode() == 403) {
+                return "That username is already taken.";
+            } else {
+                return ("Unable to register. " + x.getMessage());
+            }
         }
     }
 
@@ -73,7 +77,11 @@ public class PreloginClient implements ChessClient{
             AuthData logged = server.login(u);
             return ("Success! You logged in as " + logged.username());
         } catch (ResponseException x) {
-            return ("Unable to log in. " + x.getMessage());
+            if (x.getCode() == 401) {
+                return "Incorrect username or password.";
+            } else {
+                return ("Unable to log in. " + x.getMessage());
+            }
         }
     }
 }

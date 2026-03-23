@@ -31,15 +31,18 @@ public class repl {
 
             try {
                 result = client.eval(line);
-                if (result.contains("logged in") || result.contains("Game created") || result.contains("Here are")) {
+                if (result.contains("logged in") || result.contains("Game created") || result.contains("Here are") || result.contains("exit")){
                     state = State.SIGNEDIN;
                     client = postlog;
+                    System.out.println(client.help());
                 } else if (result.contains("logged out") || result.contains("Database cleared")) {
                     state = State.SIGNEDOUT;
                     client = prelog;
+                    System.out.println(client.help());
                 } else if (result.contains("Switching to Game")) {
                     state = State.GAMEPLAY;
                     client = gameplay;
+                    System.out.println(client.help());
                 }
                 System.out.println(result);
             } catch (Throwable e) {

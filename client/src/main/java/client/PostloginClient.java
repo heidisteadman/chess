@@ -1,11 +1,16 @@
 package client;
 
+import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
+import ui.ChessDisplay;
 
 import java.util.ArrayList;
 import java.util.Objects;
+
+import static ui.EscapeSequences.RESET_BG_COLOR;
+import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
 public class PostloginClient implements ChessClient{
     private final ServerFacade server;
@@ -45,7 +50,7 @@ public class PostloginClient implements ChessClient{
                 - Logout "logout"
                 - Create game "create" <game name>
                 - List games "list"
-                - Join a game "join" <game ID> <WHITE | BLACK>
+                - Join a game "join" <WHITE | BLACK> <game ID>
                 - Observe a game "observe" <game ID>
                 - Help "help"
                 - Quit "quit"
@@ -79,8 +84,15 @@ public class PostloginClient implements ChessClient{
     private String listGames() {
         try {
             ArrayList<GameData> games = server.listGames();
-            String listGame = games.toString();
-            return ("Success! Here are the games: " + listGame);
+            for (GameData game : games) {
+                System.out.println("Game name: " + game.gameName());
+                System.out.println("Game ID: " + game.gameID());
+                ChessDisplay show = new ChessDisplay(game.getChess().gameBoard);
+                show.displayBoard(ChessGame.TeamColor.WHITE);
+                System.out.println(RESET_BG_COLOR + RESET_TEXT_COLOR);
+            }
+
+            return ("Success! Here are the games.");
         } catch (ResponseException x) {
             return ("Failed to get games. " + x.getMessage());
         }
@@ -95,8 +107,40 @@ public class PostloginClient implements ChessClient{
         String color = inputs[1];
         String gameID = inputs[2];
 
+        int id;
         try {
-            server.joinGame(color, gameID);
+            id = Integer.parseInt(gameID);
+        } catch (Throwable x) {
+            return "Enter a valid game ID.";
+        }
+
+        if (!Objects.equals(color, "BLACK") && !Objects.equals(color, "WHITE")) {
+            return "Enter a valid team color <WHITE | BLACK>";
+        }
+
+        ChessGame.TeamColor teamCol;
+        if (Objects.equals(color, "BLACK")) {
+            teamCol = ChessGame.TeamColor.BLACK;
+        } else {
+            teamCol = ChessGame.TeamColor.WHITE;
+        }
+
+        try {
+            ArrayList<GameData> games = server.listGames();
+            GameData game = null;
+            for (GameData g : games) {
+                if (g.gameID() == id) {
+                    game = g;
+                }
+            }
+            if (game != null) {
+                server.joinGame(color, gameID);
+                ChessDisplay show = new ChessDisplay(game.getChess().gameBoard);
+                show.displayBoard(teamCol);
+                System.out.println(RESET_BG_COLOR + RESET_TEXT_COLOR);
+            } else {
+                throw new ResponseException(500, "Invalid game ID.");
+            }
             return "Success! You have joined. Switching to Game Play mode.";
         } catch (ResponseException x) {
             return ("Failed to join the game. " + x.getMessage());
@@ -110,8 +154,29 @@ public class PostloginClient implements ChessClient{
         }
 
         String gameID = inputs[1];
+        int id;
+        try {
+            id = Integer.parseInt(gameID);
+        } catch (Throwable x) {
+            return "Enter a valid game ID.";
+        }
         try {
             server.joinGame("WHITE", gameID);
+            ArrayList<GameData> games = server.listGames();
+            GameData game = null;
+            for (GameData g : games) {
+                if (g.gameID() == id) {
+                    game = g;
+                }
+            }
+
+            if (game != null) {
+                ChessDisplay show = new ChessDisplay(game.getChess().gameBoard);
+                show.displayBoard(ChessGame.TeamColor.WHITE);
+                System.out.println(RESET_BG_COLOR + RESET_TEXT_COLOR);
+            } else {
+                return "Enter a valid game ID.";
+            }
             return "Success! You have joined the game.";
         } catch (ResponseException x) {
             return ("Failed to join the game. " + x.getMessage());
