@@ -2,7 +2,6 @@ package client;
 
 import exception.ResponseException;
 import model.GameData;
-import model.GameList;
 import server.ServerFacade;
 
 import java.util.ArrayList;
