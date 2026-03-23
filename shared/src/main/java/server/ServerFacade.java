@@ -9,7 +9,6 @@ import model.*;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class ServerFacade {
     private final String serverURL;
