@@ -177,9 +177,9 @@ public class PostloginClient implements ChessClient{
             } else {
                 return "Enter a valid game ID.";
             }
-            return "Success! You have joined the game.";
+            return "Success! You are observing the game.";
         } catch (ResponseException x) {
-            return ("Failed to join the game. " + x.getMessage());
+            return ("Failed to observe the game. " + x.getMessage());
         }
     }
 

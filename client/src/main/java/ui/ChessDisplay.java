@@ -76,54 +76,6 @@ public class ChessDisplay {
         }
     }
 
-    private void drawWhiteRowSquares(PrintStream out, int colNum) {
-        for (int squareRow=0; squareRow<7; ++squareRow) {
-            for (int boardCol=7; boardCol>=0; --boardCol) {
-                String bg_color = SET_BG_COLOR_BLACK;
-                int sideHeader = colNum;
-                if (boardCol == 0) {
-                    out.print(bg_color + SET_TEXT_COLOR_GREEN + ++sideHeader);
-                }
-
-                if ((boardCol % 2 == 0) && (colNum%2 == 0)) {
-                    setGray(out);
-                    bg_color = SET_BG_COLOR_LIGHT_GREY;
-                } else if ((boardCol % 2 != 0) && (colNum %2 != 0)){
-                    setGray(out);
-                    bg_color = SET_BG_COLOR_LIGHT_GREY;
-                } else {
-                    setWhite(out);
-                    bg_color = SET_BG_COLOR_WHITE;
-                }
-
-                int prefixLength = SQUARE_SIZE_PADDED / 2;
-                int suffixLength = 0;
-                out.print(EMPTY.repeat(prefixLength));
-                ChessPosition square = new ChessPosition(colNum+1, boardCol+1);
-                ChessPiece piece = board.getPiece(square);
-                String symbol = EMPTY;
-
-                if (piece != null) {
-                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                        symbol = getWhitePiece(piece);
-                    } else {
-                        symbol = getBlackPiece(piece);
-                    }
-                }
-
-                printPlayer(out, symbol, bg_color);
-                out.print(bg_color);
-                out.print(EMPTY.repeat(suffixLength));
-
-                setBlack(out);
-                if (boardCol == 7) {
-                    out.print(SET_TEXT_COLOR_GREEN + ++sideHeader);
-                }
-            }
-            out.println();
-
-        }
-    }
 
     private void drawRowSquares(PrintStream out, int colNum) {
         for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
