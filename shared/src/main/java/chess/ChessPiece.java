@@ -351,8 +351,8 @@ public class ChessPiece {
                 myWhitePawnMoves.addAll(pawnPromoteHelper(myPosition, new ChessPosition((myPosition.getRow()+1), (myPosition.getColumn()))));
             }
         }
-        ChessMove moveUpLeft = moveHelper(board, piece, myPosition, (myPosition.getRow()+1), (myPosition.getColumn()-1));
         if (myPosition.getColumn()-1 > 0) {
+            ChessMove moveUpLeft = moveHelper(board, piece, myPosition, (myPosition.getRow()+1), (myPosition.getColumn()-1));
             if (board.checkPiece(new ChessPosition((myPosition.getRow()),(myPosition.getColumn()-2)))) {
                 if (moveUpLeft != null) {
                     if (myPosition.getRow() != 7) {
