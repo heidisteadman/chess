@@ -6,13 +6,13 @@ import java.util.Scanner;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
-public class repl {
+public class Repl {
     PreloginClient prelog;
     PostloginClient postlog;
     GamePlayClient gameplay;
     State state = State.SIGNEDOUT;
 
-    public repl(String serverURL) {
+    public Repl(String serverURL) {
         prelog = new PreloginClient(serverURL);
         postlog = new PostloginClient(serverURL);
         gameplay = new GamePlayClient(serverURL);

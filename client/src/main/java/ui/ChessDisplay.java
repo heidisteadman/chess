@@ -80,21 +80,21 @@ public class ChessDisplay {
     private void drawRowSquares(PrintStream out, int colNum) {
         for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
             for (int boardCol=0; boardCol<BOARD_HEIGHT; ++boardCol) {
-                String bg_color = SET_BG_COLOR_BLACK;
+                String backgroundColor = SET_BG_COLOR_BLACK;
                 int sideHeader = colNum;
                 if (boardCol == 0) {
-                    out.print(bg_color + SET_TEXT_COLOR_GREEN + ++sideHeader);
+                    out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
 
                 if ((boardCol % 2 == 0) && (colNum%2 == 0)) {
                     setGray(out);
-                    bg_color = SET_BG_COLOR_LIGHT_GREY;
+                    backgroundColor = SET_BG_COLOR_LIGHT_GREY;
                 } else if ((boardCol % 2 != 0) && (colNum %2 != 0)){
                     setGray(out);
-                    bg_color = SET_BG_COLOR_LIGHT_GREY;
+                    backgroundColor = SET_BG_COLOR_LIGHT_GREY;
                 } else {
                     setWhite(out);
-                    bg_color = SET_BG_COLOR_WHITE;
+                    backgroundColor = SET_BG_COLOR_WHITE;
                 }
 
                 int prefixLength = SQUARE_SIZE_PADDED / 2;
@@ -113,8 +113,8 @@ public class ChessDisplay {
                     }
                 }
 
-                printPlayer(out, symbol, bg_color);
-                out.print(bg_color);
+                printPlayer(out, symbol, backgroundColor);
+                out.print(backgroundColor);
                 out.print(EMPTY.repeat(suffixLength));
 
                 setBlack(out);

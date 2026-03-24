@@ -10,7 +10,7 @@ public class ClientMain {
         }
 
         try {
-            new repl(serverURL).run();
+            new Repl(serverURL).run();
         } catch (Throwable x) {
             System.out.printf("Unable to start server: %s%n", x.getMessage());
         }
