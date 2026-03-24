@@ -107,10 +107,8 @@ public class ChessPiece {
             if (board.checkPiece(new ChessPosition((upRow - 1), (rightCol - 1)))) {
                 if (newMove != null) {
                     newPieceMoves.add(newMove);
-                    upRow = 9;
-                } else {
-                    upRow = 9;
                 }
+                upRow = 9;
             } else {
                 if (newMove != null) {
                     newPieceMoves.add(newMove);
@@ -128,10 +126,8 @@ public class ChessPiece {
             if (board.checkPiece(new ChessPosition((upRow-1), (leftCol-1)))) {
                 if (newMove != null) {
                     newPieceMoves.add(newMove);
-                    upRow = 9;
-                } else {
-                    upRow = 9;
                 }
+                upRow = 9;
             } else {
                 if (newMove != null) {
                     newPieceMoves.add(newMove);
@@ -152,10 +148,8 @@ public class ChessPiece {
                 if (nextPiece.getTeamColor() != piece.getTeamColor()) {
                     ChessMove newMove = new ChessMove(myPosition, end, null);
                     newPieceMoves.add(newMove);
-                    downRow = 0;
-                } else {
-                    downRow = 0;
                 }
+                downRow = 0;
             } else {
                 ChessMove newMove = new ChessMove(myPosition, end, null);
                 newPieceMoves.add(newMove);
@@ -174,10 +168,8 @@ public class ChessPiece {
                 if (nextPiece.getTeamColor() != piece.getTeamColor()) {
                     ChessMove newMove = new ChessMove(myPosition, end, null);
                     newPieceMoves.add(newMove);
-                    downRow = 0;
-                } else {
-                    downRow = 0;
                 }
+                downRow = 0;
             } else {
                 ChessMove newMove = new ChessMove(myPosition, end, null);
                 newPieceMoves.add(newMove);
