@@ -52,7 +52,7 @@ public class ChessDisplay {
             out.print(SET_TEXT_COLOR_WHITE);
         } else {
             drawHeadersWhite(out);
-            drawBoard(out, color);
+            drawBoard(out,color);
             drawHeadersWhite(out);
         }
     }
@@ -61,10 +61,7 @@ public class ChessDisplay {
     private void drawBoard(PrintStream out, ChessGame.TeamColor color) {
         if (color == ChessGame.TeamColor.BLACK) {
             for (int boardRow=0; boardRow<BOARD_HEIGHT; ++boardRow) {
-                drawRowSquares(out, boardRow);
-                if (boardRow<BOARD_HEIGHT-1) {
-                    setBlack(out);
-                }
+                drawRowSquaresBlack(out, boardRow);
             }
         } else {
             for (int boardRow=BOARD_HEIGHT-1; boardRow>=0; --boardRow) {
@@ -74,22 +71,22 @@ public class ChessDisplay {
                 }
             }
         }
+
     }
 
-
-    private void drawRowSquares(PrintStream out, int colNum) {
+    private void drawRowSquaresBlack(PrintStream out, int rowNum) {
         for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
-            for (int boardCol=0; boardCol<BOARD_HEIGHT; ++boardCol) {
+            for (int boardCol=BOARD_WIDTH-1; boardCol>=0; --boardCol) {
                 String backgroundColor = SET_BG_COLOR_BLACK;
-                int sideHeader = colNum;
-                if (boardCol == 0) {
+                int sideHeader = rowNum;
+                if (boardCol == 7) {
                     out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
 
-                if ((boardCol % 2 == 0) && (colNum%2 == 0)) {
+                if ((boardCol % 2 == 0) && (rowNum %2 == 0)) {
                     setGray(out);
                     backgroundColor = SET_BG_COLOR_LIGHT_GREY;
-                } else if ((boardCol % 2 != 0) && (colNum %2 != 0)){
+                } else if ((boardCol % 2 != 0) && (rowNum %2 != 0)){
                     setGray(out);
                     backgroundColor = SET_BG_COLOR_LIGHT_GREY;
                 } else {
@@ -101,7 +98,56 @@ public class ChessDisplay {
                 int suffixLength = 0;
 
                 out.print(EMPTY.repeat(prefixLength));
-                ChessPosition square = new ChessPosition(colNum+1, boardCol+1);
+                ChessPosition square = new ChessPosition(rowNum +1, boardCol+1);
+                ChessPiece piece = board.getPiece(square);
+                String symbol = EMPTY;
+
+                if (piece != null) {
+                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        symbol = getWhitePiece(piece);
+                    } else {
+                        symbol = getBlackPiece(piece);
+                    }
+                }
+
+                printPlayer(out, symbol, backgroundColor);
+                out.print(backgroundColor);
+                out.print(EMPTY.repeat(suffixLength));
+
+                setBlack(out);
+                if (boardCol == 0) {
+                    out.print(SET_TEXT_COLOR_GREEN + ++sideHeader);
+                }
+            }
+            out.println();
+        }
+    }
+
+    private void drawRowSquares(PrintStream out, int rowNum) {
+        for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
+            for (int boardCol=0; boardCol<BOARD_HEIGHT; ++boardCol) {
+                String backgroundColor = SET_BG_COLOR_BLACK;
+                int sideHeader = rowNum;
+                if (boardCol == 0) {
+                    out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
+                }
+
+                if ((boardCol % 2 == 0) && (rowNum %2 == 0)) {
+                    setGray(out);
+                    backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+                } else if ((boardCol % 2 != 0) && (rowNum %2 != 0)){
+                    setGray(out);
+                    backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+                } else {
+                    setWhite(out);
+                    backgroundColor = SET_BG_COLOR_WHITE;
+                }
+
+                int prefixLength = SQUARE_SIZE_PADDED / 2;
+                int suffixLength = 0;
+
+                out.print(EMPTY.repeat(prefixLength));
+                ChessPosition square = new ChessPosition(rowNum +1, boardCol+1);
                 ChessPiece piece = board.getPiece(square);
                 String symbol = EMPTY;
 

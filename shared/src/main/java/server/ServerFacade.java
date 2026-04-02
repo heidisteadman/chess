@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class ServerFacade {
     private final String serverURL;
     private final HttpClient client = HttpClient.newHttpClient();
-    private record JoinGameRequest(String color, String gameID) {}
+    private record JoinGameRequest(String playerColor, String gameID) {}
     private static String authToken;
     private record CreateGameResponse(int gameID) {}
     private record CreateGameRequest(String gameName) {}
@@ -92,7 +92,8 @@ public class ServerFacade {
         JoinGameRequest join = new JoinGameRequest(color, gameID);
         try {
             var request = buildRequest("PUT", "/game", join);
-            sendRequest(request);
+            var response = sendRequest(request);
+            handleResponse(response, Object.class);
         } catch (ResponseException x) {
             throw new ResponseException(500, "Enter a valid gameID and team color.");
         }

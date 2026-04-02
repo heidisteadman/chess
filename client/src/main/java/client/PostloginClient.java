@@ -12,7 +12,7 @@ import java.util.Objects;
 import static ui.EscapeSequences.RESET_BG_COLOR;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
-public class PostloginClient implements ChessClient{
+public class PostloginClient implements ChessClient {
     private final ServerFacade server;
 
     public PostloginClient(String serverURL) {
@@ -87,8 +87,16 @@ public class PostloginClient implements ChessClient{
             for (GameData game : games) {
                 System.out.println("Game name: " + game.gameName());
                 System.out.println("Game ID: " + game.gameID());
-                ChessDisplay show = new ChessDisplay(game.getChess().gameBoard);
-                show.displayBoard(ChessGame.TeamColor.WHITE);
+                if (game.whiteUsername() != null ){
+                    System.out.println("White username: " + game.whiteUsername());
+                } else {
+                    System.out.println("White username: none");
+                }
+                if (game.blackUsername() != null) {
+                    System.out.println("Black username: " + game.blackUsername());
+                } else {
+                    System.out.println("Black username: none");
+                }
                 System.out.println(RESET_BG_COLOR + RESET_TEXT_COLOR);
             }
 
