@@ -14,10 +14,13 @@ import static ui.EscapeSequences.RESET_TEXT_COLOR;
 
 public class PostloginClient implements ChessClient {
     private final ServerFacade server;
+    private String joinedCol;
 
-    public PostloginClient(String serverURL) {
+    public PostloginClient(String serverURL) throws ResponseException {
         this.server = new ServerFacade(serverURL);
     }
+
+    public String getColor() {return joinedCol;}
 
     public String eval(String in) {
         if (Objects.equals(in, "quit")) {
@@ -142,6 +145,8 @@ public class PostloginClient implements ChessClient {
                 }
             }
             if (game != null) {
+                joinedCol = color;
+
                 server.joinGame(color, gameID);
                 ChessDisplay show = new ChessDisplay(game.getChess().gameBoard);
                 show.displayBoard(teamCol);

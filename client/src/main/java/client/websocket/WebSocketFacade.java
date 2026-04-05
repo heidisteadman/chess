@@ -4,7 +4,6 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import jakarta.websocket.*;
-import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;

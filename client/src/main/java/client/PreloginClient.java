@@ -11,7 +11,7 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 public class PreloginClient implements ChessClient{
     private final ServerFacade server;
 
-    public PreloginClient(String serverURL) {
+    public PreloginClient(String serverURL)  {
         this.server = new ServerFacade(serverURL);
     }
 

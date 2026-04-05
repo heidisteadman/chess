@@ -1,5 +1,7 @@
 package client;
 
+import exception.ResponseException;
+
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -12,7 +14,7 @@ public class Repl {
     GamePlayClient gameplay;
     State state = State.SIGNEDOUT;
 
-    public Repl(String serverURL) {
+    public Repl(String serverURL) throws ResponseException {
         prelog = new PreloginClient(serverURL);
         postlog = new PostloginClient(serverURL);
         gameplay = new GamePlayClient(serverURL);
@@ -40,6 +42,7 @@ public class Repl {
                     client = prelog;
                     System.out.println(client.help());
                 } else if (result.contains("Switching to Game")) {
+                    gameplay.setColor(postlog.getColor());
                     state = State.GAMEPLAY;
                     client = gameplay;
                     System.out.println(client.help());
