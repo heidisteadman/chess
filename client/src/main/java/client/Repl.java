@@ -33,7 +33,7 @@ public class Repl {
 
             try {
                 result = client.eval(line);
-                if (result.contains("logged in") || result.contains("Game created") || result.contains("Here are") || result.contains("exit")){
+                if (result.contains("logged in") || result.contains("Game created") || result.contains("Here are") || result.contains("left")){
                     state = State.SIGNEDIN;
                     client = postlog;
                     System.out.println(client.help());
