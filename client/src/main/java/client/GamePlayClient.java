@@ -1,6 +1,8 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
 import exception.ResponseException;
@@ -43,14 +45,17 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
     }
 
     public String eval(String in) {
+        if (Objects.equals(in, "help")) {
+            return help();
+        }
         var inputs = in.split(" ");
         try {
             return switch (inputs[0]) {
                 case "redraw" -> redraw();
-                case "leave" -> leave(in);
+                case "leave" -> leave();
                 case "move" -> makeMove(in);
                 case "highlight" -> highlight(in);
-                case "resign" -> resign(in);
+                case "resign" -> resign();
                 case null, default -> "Invalid input. Type help for options.";
             };
         } catch (ResponseException e) {
@@ -83,23 +88,45 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
         return "";
     }
 
-    private String leave(String in) throws ResponseException{
+    private String leave() throws ResponseException{
         ws.leave(authToken, gameID);
         gameID = 0;
         authToken = null;
         return "You left the game.";
     }
 
-    private String makeMove(String in) {
-        return "not implemented";
+    private String makeMove(String in) throws ResponseException {
+        var inputs = in.split(" ");
+        if (inputs.length < 3) {
+            return "Enter a start position and end position (e.g. A2 A3).";
+        }
+        String starts = inputs[1];
+        char[] start = starts.toCharArray();
+        String ends = inputs[2];
+        char[] end  = ends.toCharArray();
+
+        if ((start[0] >= 'A') && (start[0] <= 'H') && (start[1] >= '1') && (start[1] <= '8')) {
+            if ((end[0] >= 'A') && (end[0] <= 'H') && (end[1] >= '1') && (end[1] <= '8')) {
+                if (game.isEnded()) {
+                    return "The game has ended, you can leave.";
+                }
+                ChessPosition startPos = new ChessPosition((start[1]-'0'), (start[0]-'a'+1));
+                ChessPosition endPos = new ChessPosition((end[1]-'0'), (end[0]-'a'+1));
+                ChessMove move = new ChessMove(startPos, endPos, null);
+                ws.makeMove(authToken, gameID, move);
+                return String.format("You moved your piece at <%s> to <%s>.", starts, ends);
+            }
+        }
+        return "Enter a valid start position and end position (e.g. A2 A3).";
     }
 
     private String highlight(String in) {
         return "not implemented";
     }
 
-    private String resign(String in) {
-        return "not implemented";
+    private String resign() throws ResponseException {
+        ws.resign(authToken, gameID);
+        return "You resigned.";
     }
 
     public void notify(Notification notification) {}

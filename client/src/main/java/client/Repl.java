@@ -33,7 +33,7 @@ public class Repl {
 
             try {
                 result = client.eval(line);
-                if (result.contains("logged in") || result.contains("Game created") || result.contains("Here are") || result.contains("left")){
+                if (result.contains("logged in") || result.contains("left") || result.contains("resigned")){
                     state = State.SIGNEDIN;
                     client = postlog;
                     System.out.println(client.help());
@@ -41,8 +41,9 @@ public class Repl {
                     state = State.SIGNEDOUT;
                     client = prelog;
                     System.out.println(client.help());
-                } else if (result.contains("Switching to Game")) {
+                } else if (result.contains("joined")) {
                     gameplay.setColor(postlog.getColor());
+                    gameplay.connect(prelog.getAuth(), postlog.getGameID());
                     state = State.GAMEPLAY;
                     client = gameplay;
                     System.out.println(client.help());

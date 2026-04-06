@@ -15,6 +15,7 @@ import static ui.EscapeSequences.RESET_TEXT_COLOR;
 public class PostloginClient implements ChessClient {
     private final ServerFacade server;
     private String joinedCol;
+    private int gameID = 0;
 
     public PostloginClient(String serverURL) throws ResponseException {
         this.server = new ServerFacade(serverURL);
@@ -142,6 +143,7 @@ public class PostloginClient implements ChessClient {
             for (GameData g : games) {
                 if (g.gameID() == id) {
                     game = g;
+                    gameID = String.valueOf(g.gameID());
                 }
             }
             if (game != null) {
@@ -203,6 +205,10 @@ public class PostloginClient implements ChessClient {
         } catch (ResponseException x) {
             return ("Failed to clear database. " + x.getMessage());
         }
+    }
+
+    public int getGameID() {
+        return gameID;
     }
 
 

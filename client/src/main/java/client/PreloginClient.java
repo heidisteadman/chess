@@ -10,6 +10,7 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
 
 public class PreloginClient implements ChessClient{
     private final ServerFacade server;
+    private String authToken;
 
     public PreloginClient(String serverURL)  {
         this.server = new ServerFacade(serverURL);
@@ -55,6 +56,7 @@ public class PreloginClient implements ChessClient{
         UserData u = new UserData(user, pass, email);
         try {
             AuthData logged = server.register(u);
+            authToken = logged.getToken();
             return ("Success! You are logged in as " + logged.username());
         } catch (ResponseException x) {
             if (x.getCode() == 403) {
@@ -83,5 +85,9 @@ public class PreloginClient implements ChessClient{
                 return ("Unable to log in. " + x.getMessage());
             }
         }
+    }
+
+    public String getAuth() {
+        return authToken;
     }
 }

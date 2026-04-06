@@ -4,43 +4,35 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
-/**
- * For a class that can manage a chess game, making moves on a board
- * <p>
- * Note: You can add to this class, but you may not alter
- * signature of the existing methods.
- */
 public class ChessGame {
 
     public TeamColor teamTurn = TeamColor.WHITE;
     public ChessBoard gameBoard = new ChessBoard();
+    private boolean ended = false;
 
     public ChessGame() {
         gameBoard.resetBoard();
     }
 
-    /**
-     * @return Which team's turn it is
-     */
     public TeamColor getTeamTurn() {
         return teamTurn;
     }
 
-    /**
-     * Sets which teams turn it is
-     *
-     * @param team the team whose turn it is
-     */
     public void setTeamTurn(TeamColor team) {
         teamTurn = team;
     }
 
-    /**
-     * Enum identifying the 2 possible teams in a chess game
-     */
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+
+    public boolean isEnded() {
+        return ended;
+    }
+
+    public void setEnded() {
+        ended = true;
     }
 
     /**
