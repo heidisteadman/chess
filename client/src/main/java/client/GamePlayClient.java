@@ -12,6 +12,7 @@ import ui.ChessDisplay;
 
 import javax.management.Notification;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 
 import static ui.EscapeSequences.RESET_BG_COLOR;
@@ -121,7 +122,31 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
     }
 
     private String highlight(String in) {
-        return "not implemented";
+        var inputs = in.split(" ");
+        if (inputs.length < 2) {
+            return "Enter a start position (e.g. A1).";
+        }
+        String starts = inputs[1];
+        char[] start = starts.toCharArray();
+
+        if ((start[0] >= 'A') && (start[0] <= 'H') && (start[1] >= '1') && (start[1] <= '8')) {
+            if (game.isEnded()) {
+                return "The game has ended, you can leave.";
+            }
+            ChessPosition startPos = new ChessPosition((start[1]-'0'), (start[0]-'a'+1));
+            if (game.getBoard().getPiece(startPos) == null) {
+                return "No piece at selected position.";
+            }
+            Collection<ChessMove> moves = game.validMoves(startPos);
+            ChessDisplay show  = new ChessDisplay(game.getBoard());
+            show.highlightMoves(moves, startPos);
+            if (Objects.equals(joinedCol, "WHITE")) {
+                show.displayBoard(ChessGame.TeamColor.WHITE);
+            } else {
+                show.displayBoard(ChessGame.TeamColor.BLACK);
+            }
+        }
+        return "";
     }
 
     private String resign() throws ResponseException {

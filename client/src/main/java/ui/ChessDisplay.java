@@ -1,12 +1,12 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -33,6 +33,9 @@ public class ChessDisplay {
     public static final String BLACK_PAWN = EscapeSequences.BLACK_PAWN;
 
     private final ChessBoard board;
+
+    record Pair<A, B>(A first, B second) {}
+    private ArrayList<Pair<Integer, Integer>> pos = new ArrayList<>();
 
     public ChessDisplay(ChessBoard board) {
         this.board = board;
@@ -79,16 +82,27 @@ public class ChessDisplay {
             for (int boardCol=BOARD_WIDTH-1; boardCol>=0; --boardCol) {
                 String backgroundColor = SET_BG_COLOR_BLACK;
                 int sideHeader = rowNum;
+                boolean highlightSquare = false;
+                Pair<Integer, Integer> check = new Pair<Integer, Integer>(squareRow, boardCol);
+                if (pos.contains(check)) {
+                    highlightSquare = true;
+                }
                 if (boardCol == 7) {
                     out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
 
-                if ((boardCol % 2 == 0) && (rowNum %2 == 0)) {
+                if ((boardCol % 2 == 0) && (rowNum %2 == 0) && !highlightSquare) {
                     setGray(out);
                     backgroundColor = SET_BG_COLOR_LIGHT_GREY;
-                } else if ((boardCol % 2 != 0) && (rowNum %2 != 0)){
+                } else if ((boardCol % 2 == 0) && (rowNum % 2 == 0) && highlightSquare) {
+                    setDarkGreen(out);
+                    backgroundColor = SET_BG_COLOR_DARK_GREEN;
+                } else if ((boardCol % 2 != 0) && (rowNum % 2 != 0) && !highlightSquare) {
                     setGray(out);
                     backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+                } else if ((boardCol % 2 != 0) && (rowNum % 2 != 0) && highlightSquare) {
+                    setGreen(out);
+                    backgroundColor = SET_BG_COLOR_GREEN;
                 } else {
                     setWhite(out);
                     backgroundColor = SET_BG_COLOR_WHITE;
@@ -118,6 +132,7 @@ public class ChessDisplay {
                 if (boardCol == 0) {
                     out.print(SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
+                highlightSquare = false;
             }
             out.println();
         }
@@ -169,6 +184,17 @@ public class ChessDisplay {
                 }
             }
             out.println();
+        }
+    }
+
+    public void highlightMoves(Collection<ChessMove> moves, ChessPosition start) {
+        ArrayList<Pair<Integer, Integer>> positions = new ArrayList<>();
+        positions.add(new Pair<>(start.getRow(), start.getColumn()));
+        if (!moves.isEmpty()) {
+            for (ChessMove move : moves) {
+                positions.add(new Pair<>(move.getEndPosition().getRow(), move.getEndPosition().getColumn()));
+            }
+            pos = positions;
         }
     }
 
@@ -254,9 +280,16 @@ public class ChessDisplay {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-
     private void setGray(PrintStream out) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_LIGHT_GREY);
+    }
+
+    private void setDarkGreen(PrintStream out) {
+        out.print(SET_BG_COLOR_DARK_GREEN);
+    }
+
+    private void setGreen(PrintStream out) {
+        out.print(SET_BG_COLOR_GREEN);
     }
 }
