@@ -5,6 +5,8 @@ import exception.ResponseException;
 import model.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Objects;
+
 import com.google.gson.Gson;
 
 public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
@@ -112,5 +114,19 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
         }
         var statement = "UPDATE games SET game=? WHERE gameID=?";
         SQLDAO.executeUpdate(statement, game, gameID);
+    }
+
+    public void leaveGame(int gameID, String color) throws ResponseException {
+        GameData game = getGame(gameID);
+        if (game == null) {
+            throw new ResponseException(400, "Error: game does not exist");
+        }
+        if (Objects.equals(color, "WHITE")) {
+            var statement = "UPDATE games SET whiteUser=? WHERE gameID=?";
+            SQLDAO.executeUpdate(statement, "", gameID);
+        } else if (Objects.equals(color, "BLACK")) {
+            var statement = "UPDATE games SET blackUser=? WHERE gameID=?";
+            SQLDAO.executeUpdate(statement, "", gameID);
+        }
     }
 }

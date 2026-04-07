@@ -173,7 +173,23 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return error;
     }
 
-    private void leave(Session session, LeaveCommand leaveCommand, String username) {}
+    private void leave(Session session, LeaveCommand leaveCommand, String username) throws ResponseException, IOException {
+        MySQLGameDAO gameDAO = new MySQLGameDAO();
+        GameData game = gameDAO.getGame(leaveCommand.getGameID());
+        if (game == null) {
+            ErrorMessage error = new ErrorMessage("Error: no game available to leave!");
+            sendMessage(session.getRemote(), error);
+            return;
+        }
+        NotificationMessage notify = new NotificationMessage(String.format("'%s' left the game", username));
+        if (Objects.equals(username, game.whiteUsername())) {
+            gameDAO.leaveGame(leaveCommand.getGameID(), "WHITE");
+        } else if (Objects.equals(username, game.blackUsername())) {
+            gameDAO.leaveGame(leaveCommand.getGameID(), "BLACK");
+        }
+        connections.remove(session);
+        connections.broadcast(session, notify);
+    }
 
     private void resign(Session session, ResignCommand resignCommand, String username) {}
 }
