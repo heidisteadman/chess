@@ -104,4 +104,13 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
 
         return new GameData(gameID, white, black, gname, game);
     }
+
+    public void updateGame(int gameID, String game) throws ResponseException {
+        GameData oldGame = getGame(gameID);
+        if (oldGame == null) {
+            throw new ResponseException(400, "Error: old game does not exist");
+        }
+        var statement = "UPDATE games SET game=? WHERE gameID=?";
+        SQLDAO.executeUpdate(statement, game, gameID);
+    }
 }
