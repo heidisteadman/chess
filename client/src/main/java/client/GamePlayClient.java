@@ -40,7 +40,12 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
         for (GameData g : games) {
             if (g.gameID() == gameID) {
                 this.game = g.getChess();
+                System.out.println("Found game, connecting.");
             }
+        }
+        if (game == null) {
+            System.out.println("Game not found");
+            return;
         }
         ws.connect(auth, gameID);
     }

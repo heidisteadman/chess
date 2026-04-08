@@ -41,7 +41,7 @@ public class Repl {
                     state = State.SIGNEDOUT;
                     client = prelog;
                     System.out.println(client.help());
-                } else if (result.contains("joined")) {
+                } else if (result.contains("joined") || result.contains("observing")) {
                     gameplay.setColor(postlog.getColor());
                     gameplay.connect(prelog.getAuth(), postlog.getGameID());
                     state = State.GAMEPLAY;

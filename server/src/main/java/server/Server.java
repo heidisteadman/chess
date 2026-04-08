@@ -10,6 +10,7 @@ import exception.ResponseException;
 import service.MySQLGameService;
 import service.MySQLUserService;
 import service.MySQLAuthService;
+import websocket.WebsocketHandler;
 
 public class Server {
 
@@ -46,6 +47,7 @@ public class Server {
     private final MySQLAuthService authService = new MySQLAuthService(authDAO);
 
     public Server() {
+        WebsocketHandler wsh = new WebsocketHandler();
         javalin = Javalin.create(config -> config.staticFiles.add("web"))
                 .post("/user", this::register)
                 .delete("/db", this::clear)
@@ -54,10 +56,12 @@ public class Server {
                 .get("/game", this::listGames)
                 .post("/game", this::createGame)
                 .put("/game", this::joinGame)
-                .exception(ResponseException.class, this::exceptionHandler);
-
-        // Register your endpoints and exception handlers here.
-
+                .exception(ResponseException.class, this::exceptionHandler)
+                .ws("/ws", ws -> {
+                    ws.onConnect(wsh);
+                    ws.onMessage(wsh);
+                    ws.onClose(wsh);
+                });
 
     }
 
