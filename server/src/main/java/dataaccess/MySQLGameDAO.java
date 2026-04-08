@@ -129,4 +129,15 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
             SQLDAO.executeUpdate(statement, "", gameID);
         }
     }
+
+    public void endGame(int gameID) throws ResponseException {
+        GameData oldGame = getGame(gameID);
+        if (oldGame == null) {
+            throw new ResponseException(400, "Error: game does not exist");
+        }
+        oldGame.getChess().setEnded();
+        String jsonGame = new Gson().toJson(oldGame);
+        var statement = "UPDATE games SET game=? WHERE gameID=?";
+        SQLDAO.executeUpdate(statement, jsonGame, gameID);
+    }
 }

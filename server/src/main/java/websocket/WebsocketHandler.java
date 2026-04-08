@@ -13,6 +13,7 @@ import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
+import org.jetbrains.annotations.NotNull;
 import websocket.commands.*;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -23,7 +24,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
 
-import static websocket.commands.UserGameCommand.CommandType.CONNECT;
 
 public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
@@ -66,7 +66,7 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleClose(WsCloseContext ctx) {
+    public void handleClose(@NotNull WsCloseContext ctx) {
         System.out.println("Websocket closed");
     }
 
@@ -191,5 +191,22 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.broadcast(session, notify);
     }
 
-    private void resign(Session session, ResignCommand resignCommand, String username) {}
+    private void resign(Session session, ResignCommand resignCommand, String username) throws ResponseException, IOException {
+        MySQLGameDAO gameDAO = new MySQLGameDAO();
+        GameData game = gameDAO.getGame(resignCommand.getGameID());
+        if (game == null) {
+            ErrorMessage error = new ErrorMessage("Error: no game available to resign!");
+            sendMessage(session.getRemote(), error);
+            return;
+        }
+        if ((!Objects.equals(username, game.whiteUsername())) && (!Objects.equals(username, game.blackUsername()))) {
+            ErrorMessage error = new ErrorMessage("Error: an observer cannot resign!");
+            sendMessage(session.getRemote(), error);
+        }
+        gameDAO.endGame(resignCommand.getGameID());
+        LoadGameMessage load = new LoadGameMessage(new Gson().toJson(game.getChess()));
+        connections.broadcast(session, load);
+        NotificationMessage notify = new NotificationMessage(String.format("'%s' resigned from the game! Game over.", username));
+        connections.broadcast(session, notify);
+    }
 }
