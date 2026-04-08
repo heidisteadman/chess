@@ -112,6 +112,23 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             sendMessage(session.getRemote(), error);
             return;
         }
+        if ((Objects.equals(username, game.whiteUsername())) && (game.getChess().getTeamTurn() == ChessGame.TeamColor.WHITE) && (isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.WHITE)!=null)) {
+            NotificationMessage stale = new NotificationMessage(isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.WHITE));
+            connections.broadcast(session, stale);
+            sendMessage(session.getRemote(), stale);
+            gameDAO.endGame(moveCommand.getGameID());
+            LoadGameMessage staleLoad = new LoadGameMessage(new Gson().toJson(game.getChess()));
+            connections.broadcast(session, staleLoad);
+            sendMessage(session.getRemote(), staleLoad);
+        } else if ((Objects.equals(username, game.blackUsername())) && (game.getChess().getTeamTurn() == ChessGame.TeamColor.BLACK) && (isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.BLACK)!=null)) {
+            NotificationMessage stale = new NotificationMessage(isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.WHITE));
+            connections.broadcast(session, stale);
+            sendMessage(session.getRemote(), stale);
+            gameDAO.endGame(moveCommand.getGameID());
+            LoadGameMessage staleLoad = new LoadGameMessage(new Gson().toJson(game.getChess()));
+            connections.broadcast(session, staleLoad);
+            sendMessage(session.getRemote(), staleLoad);
+        }
         ChessMove move = moveCommand.getMove();
         ChessPiece piece = game.getChess().getBoard().getPiece(move.getStartPosition());
         ErrorMessage gameError = null;
@@ -155,7 +172,42 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             connections.broadcast(session, warningMessage);
             sendMessage(session.getRemote(), warningMessage);
         }
+        String check = isCheckmate(moveCommand.getGameID());
+        if (!Objects.equals(check, null)) {
+            NotificationMessage notice = new NotificationMessage(check);
+            connections.broadcast(session, notice);
+            sendMessage(session.getRemote(), notice);
+            gameDAO.endGame(moveCommand.getGameID());
+            LoadGameMessage load = new LoadGameMessage(new Gson().toJson(game.getChess()));
+            connections.broadcast(session, load);
+            sendMessage(session.getRemote(), load);
+        }
 
+
+    }
+
+    private String isStalemate(int gameID, ChessGame.TeamColor color) throws ResponseException {
+        MySQLGameDAO gameDAO = new MySQLGameDAO();
+        GameData game = gameDAO.getGame(gameID);
+        ChessGame chess = game.getChess();
+        if (chess.isInStalemate(color)) {
+            return "Stalemate! Game over.";
+        }
+        return null;
+    }
+
+    private String isCheckmate(int gameID) throws ResponseException {
+        MySQLGameDAO gameDAO = new MySQLGameDAO();
+        GameData game = gameDAO.getGame(gameID);
+        ChessGame chess = game.getChess();
+        if (chess.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            String black = game.blackUsername();
+            return String.format("'%s' is in checkmate! Game over.", black);
+        } else if (chess.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            String white = game.whiteUsername();
+            return String.format("'%s' is in checkmate! Game over.", white);
+        }
+        return null;
     }
 
     private ErrorMessage getErrorMessage(String username, GameData game) {
