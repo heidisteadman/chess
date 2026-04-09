@@ -15,7 +15,7 @@ import static ui.EscapeSequences.RESET_TEXT_COLOR;
 public class PostloginClient implements ChessClient {
     private final ServerFacade server;
     private String joinedCol;
-    private int gameID = 1000;
+    private int gameID = 0;
 
     public PostloginClient(String serverURL) throws ResponseException {
         this.server = new ServerFacade(serverURL);

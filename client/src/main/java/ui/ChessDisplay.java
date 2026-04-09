@@ -58,6 +58,7 @@ public class ChessDisplay {
             drawBoard(out,color);
             drawHeadersWhite(out);
         }
+        out.print(RESET_TEXT_COLOR);
     }
 
 
@@ -132,8 +133,8 @@ public class ChessDisplay {
                 if (boardCol == 0) {
                     out.print(SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
-                highlightSquare = false;
             }
+
             out.println();
         }
     }
@@ -142,17 +143,28 @@ public class ChessDisplay {
         for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
             for (int boardCol=0; boardCol<BOARD_HEIGHT; ++boardCol) {
                 String backgroundColor = SET_BG_COLOR_BLACK;
+                boolean highlightSquare = false;
+                Pair<Integer, Integer> check = new Pair<Integer, Integer>(squareRow, boardCol);
+                if (pos.contains(check)) {
+                    highlightSquare = true;
+                }
                 int sideHeader = rowNum;
                 if (boardCol == 0) {
                     out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
 
-                if ((boardCol % 2 == 0) && (rowNum %2 == 0)) {
+                if ((boardCol % 2 == 0) && (rowNum % 2 == 0) && !highlightSquare) {
                     setGray(out);
                     backgroundColor = SET_BG_COLOR_LIGHT_GREY;
-                } else if ((boardCol % 2 != 0) && (rowNum %2 != 0)){
+                } else if ((boardCol % 2 != 0) && (rowNum % 2 != 0) && !highlightSquare) {
                     setGray(out);
                     backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+                } else if ((boardCol%2 == 0) && (rowNum%2 == 0) && highlightSquare) {
+                    setDarkGreen(out);
+                    backgroundColor = SET_BG_COLOR_DARK_GREEN;
+                } else if ((boardCol%2 != 0) && (rowNum != 0) && highlightSquare) {
+                    setDarkGreen(out);
+                    backgroundColor = SET_BG_COLOR_DARK_GREEN;
                 } else {
                     setWhite(out);
                     backgroundColor = SET_BG_COLOR_WHITE;
@@ -194,7 +206,7 @@ public class ChessDisplay {
             for (ChessMove move : moves) {
                 positions.add(new Pair<>(move.getEndPosition().getRow(), move.getEndPosition().getColumn()));
             }
-            pos = positions;
+            this.pos = positions;
         }
     }
 
@@ -235,7 +247,7 @@ public class ChessDisplay {
     }
 
     private void drawHeadersBlack(PrintStream out) {
-        setBlack(out);
+        setGray(out);
         out.print("0");
         String[] headers = {" H ", "  G ", " F ", "  E ", "  D ", " C ", "  B ", " A "};
         for (int boardCol=0; boardCol<BOARD_WIDTH; ++boardCol) {
@@ -248,7 +260,7 @@ public class ChessDisplay {
     }
 
     private void drawHeadersWhite(PrintStream out) {
-        setBlack(out);
+        setGray(out);
         out.print("0");
 
         String[] headers = {" A ", "  B ", " C ", "  D ", "  E ", " F ", "  G ", " H "};
@@ -263,7 +275,7 @@ public class ChessDisplay {
 
     private void printPlayer(PrintStream out, String player, String bgColor) {
         out.print(bgColor);
-        out.print(SET_TEXT_COLOR_GREEN);
+        out.print(SET_TEXT_COLOR_BLACK);
 
         out.print(player);
 

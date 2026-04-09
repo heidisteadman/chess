@@ -1,34 +1,41 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessGameTypeAdapter;
 import chess.ChessMove;
 import chess.ChessPosition;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
 import ui.ChessDisplay;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import javax.management.Notification;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
-import static ui.EscapeSequences.RESET_BG_COLOR;
-import static ui.EscapeSequences.RESET_TEXT_COLOR;
+import static ui.EscapeSequences.*;
 
 public class GamePlayClient implements ChessClient, NotificationHandler {
     private final ServerFacade server;
-    private final WebSocketFacade ws;
+    private WebSocketFacade ws;
     private String joinedCol;
     private int gameID;
     private String authToken;
     private ChessGame game;
+    private final String url;
 
     public GamePlayClient(String serverURL) throws ResponseException {
         server = new ServerFacade(serverURL);
-        ws = new WebSocketFacade(serverURL, this);
+        this.url = serverURL;
     }
 
     public void setColor(String color) { joinedCol = color; }
@@ -36,6 +43,7 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
     public void connect(String auth, int gameID) throws ResponseException {
         this.authToken = auth;
         this.gameID = gameID;
+        ws = new WebSocketFacade(url, this);
         ArrayList<GameData> games = server.listGames();
         for (GameData g : games) {
             if (g.gameID() == gameID) {
@@ -116,8 +124,10 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
                 if (game.isEnded()) {
                     return "The game has ended, you can leave.";
                 }
-                ChessPosition startPos = new ChessPosition((start[1]-'0'), (start[0]-'a'+1));
-                ChessPosition endPos = new ChessPosition((end[1]-'0'), (end[0]-'a'+1));
+                int startCol = starts.charAt(0) - 'A' + 1;
+                int startRow = Character.getNumericValue(starts.charAt(1));
+                ChessPosition startPos = new ChessPosition(startRow, startCol);
+                ChessPosition endPos = new ChessPosition((end[1]-'0'), (end[0]-'A'+1));
                 ChessMove move = new ChessMove(startPos, endPos, null);
                 ws.makeMove(authToken, gameID, move);
                 return String.format("You moved your piece at <%s> to <%s>.", starts, ends);
@@ -138,7 +148,7 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
             if (game.isEnded()) {
                 return "The game has ended, you can leave.";
             }
-            ChessPosition startPos = new ChessPosition((start[1]-'0'), (start[0]-'a'+1));
+            ChessPosition startPos = new ChessPosition((start[1]-'0'), (start[0]-'A'+1));
             if (game.getBoard().getPiece(startPos) == null) {
                 return "No piece at selected position.";
             }
@@ -159,5 +169,27 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
         return "You resigned.";
     }
 
-    public void notify(Notification notification) {}
+    public void notify(String message) {
+        ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
+        switch (serverMessage.getServerMessageType()) {
+            case ERROR -> {
+                ErrorMessage error = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.println("\n" + SET_TEXT_COLOR_RED + error.getErrorMessage());
+            }
+            case NOTIFICATION -> {
+                NotificationMessage notice = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.println("\n" + SET_TEXT_COLOR_MAGENTA + notice.getNotification());
+            }
+            case LOAD_GAME -> {
+                LoadGameMessage load = new Gson().fromJson(message, LoadGameMessage.class);
+                loadGame(load);
+            }
+        }
+        System.out.println("\n" + RESET_TEXT_COLOR + "GAMEPLAY >>> ");
+    }
+
+    private void loadGame(LoadGameMessage load) {
+        GsonBuilder gson = new GsonBuilder();
+        gson.registerTypeAdapter(ChessGame.class, new ChessGameTypeAdapter());
+    }
 }

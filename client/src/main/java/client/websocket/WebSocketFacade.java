@@ -8,8 +8,8 @@ import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.ResignCommand;
+import websocket.messages.NotificationMessage;
 
-import javax.management.Notification;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,8 +30,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
-                    notificationHandler.notify(notification);
+                    notificationHandler.notify(message);
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException x) {
