@@ -136,7 +136,7 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
             throw new ResponseException(400, "Error: game does not exist");
         }
         oldGame.getChess().setEnded();
-        String jsonGame = new Gson().toJson(oldGame);
+        String jsonGame = new Gson().toJson(oldGame.getChess());
         var statement = "UPDATE games SET game=? WHERE gameID=?";
         SQLDAO.executeUpdate(statement, jsonGame, gameID);
     }

@@ -8,7 +8,6 @@ import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.ResignCommand;
-import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
 import java.net.URI;

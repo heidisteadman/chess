@@ -13,6 +13,7 @@ import websocket.messages.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
@@ -157,8 +158,16 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
     }
 
     private String resign() throws ResponseException {
-        ws.resign(authToken, gameID);
-        return "You resigned.";
+        System.out.println("You are attempting to resign. Are you sure?");
+        Scanner scan = new Scanner(System.in);
+        String confirm = scan.nextLine().trim().toLowerCase();
+        if (confirm.equals("yes")) {
+            ws.resign(authToken, gameID);
+            return "";
+        } else {
+            return "Continuing game!";
+        }
+
     }
 
     public void notify(String message) {
