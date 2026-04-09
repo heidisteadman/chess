@@ -1,23 +1,15 @@
 package client;
 
-import chess.ChessGame;
-import chess.ChessGameTypeAdapter;
-import chess.ChessMove;
-import chess.ChessPosition;
-import client.websocket.NotificationHandler;
-import client.websocket.WebSocketFacade;
+import chess.*;
+import client.websocket.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import exception.ResponseException;
 import model.GameData;
 import server.ServerFacade;
 import ui.ChessDisplay;
-import websocket.messages.ErrorMessage;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
-import javax.management.Notification;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -33,7 +25,7 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
     private ChessGame game;
     private final String url;
 
-    public GamePlayClient(String serverURL) throws ResponseException {
+    public GamePlayClient(String serverURL) {
         server = new ServerFacade(serverURL);
         this.url = serverURL;
     }
@@ -189,7 +181,11 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
     }
 
     private void loadGame(LoadGameMessage load) {
-        GsonBuilder gson = new GsonBuilder();
-        gson.registerTypeAdapter(ChessGame.class, new ChessGameTypeAdapter());
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ChessGame.class, new ChessGameTypeAdapter());
+        Gson gson = gsonBuilder.create();
+        game = gson.fromJson(load.getGame(), ChessGame.class);
+        ChessDisplay dis = new ChessDisplay(game.getBoard());
+        dis.displayBoard(game.teamTurn);
     }
 }
