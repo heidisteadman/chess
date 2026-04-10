@@ -144,31 +144,44 @@ public class ChessGame {
         ChessBoard board = getBoard();
         ChessPosition kingPos = board.findPiece(ChessPiece.PieceType.KING, teamColor, board);
 
-        for (int i=1; i<=8; i++) {
-            for (int j=1; j<=8; j++) {
-                ChessPosition pos = new ChessPosition(i, j);
-                ChessPosition checkPos = new ChessPosition((i-1), (j-1));
-                if (board.checkPiece(checkPos)) {
-                    ChessPiece piece = board.getPiece(pos);
-                    if ((piece.getTeamColor() != teamColor)&&(piece.getPieceType() != ChessPiece.PieceType.PAWN)) {
-                        Collection<ChessMove> moves = piece.pieceMoves(board, pos);
-                        ChessMove check = new ChessMove(pos, kingPos, null);
-                        if (moves.contains(check)) {
-                            return true;
-                        }
-                    } else if (piece.getTeamColor()!=teamColor) {
-                        ArrayList<ChessMove> pawns = addPawns(pos, kingPos);
-                        Collection<ChessMove> moves = piece.pieceMoves(board, pos);
-                        for (ChessMove move : pawns) {
-                            if (moves.contains(move)) {
-                                return true;
-                            }
-                        }
-                    }
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                if (pieceThreatensCking(i, j, teamColor, kingPos, board)) {
+                    return true;
                 }
             }
         }
+        return false;
+    }
 
+    private boolean pieceThreatensCking(int i, int j, TeamColor teamColor, ChessPosition kingPos, ChessBoard board) {
+        ChessPosition checkPos = new ChessPosition(i - 1, j - 1);
+        if (!board.checkPiece(checkPos)) {
+            return false;
+        }
+        ChessPosition pos = new ChessPosition(i, j);
+        ChessPiece piece = board.getPiece(pos);
+        if (piece.getTeamColor() == teamColor) {
+            return false;
+        }
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+            return pawnThreatensKing(piece, pos, kingPos, board);
+        }
+        return nonPawnThreatensKing(piece, pos, kingPos, board);
+    }
+
+    private boolean nonPawnThreatensKing(ChessPiece piece, ChessPosition pos, ChessPosition kingPos, ChessBoard board) {
+        Collection<ChessMove> moves = piece.pieceMoves(board, pos);
+        return moves.contains(new ChessMove(pos, kingPos, null));
+    }
+
+    private boolean pawnThreatensKing(ChessPiece piece, ChessPosition pos, ChessPosition kingPos, ChessBoard board) {
+        Collection<ChessMove> moves = piece.pieceMoves(board, pos);
+        for (ChessMove pawnMove : addPawns(pos, kingPos)) {
+            if (moves.contains(pawnMove)) {
+                return true;
+            }
+        }
         return false;
     }
 
