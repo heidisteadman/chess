@@ -90,4 +90,8 @@ public class PreloginClient implements ChessClient{
     public String getAuth() {
         return authToken;
     }
+
+    public void nullifyAuth() {
+        this.authToken = null;
+    }
 }

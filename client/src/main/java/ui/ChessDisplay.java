@@ -33,6 +33,7 @@ public class ChessDisplay {
     public static final String BLACK_PAWN = EscapeSequences.BLACK_PAWN;
 
     private final ChessBoard board;
+    private String backgroundColor = SET_BG_COLOR_BLACK;
 
     record Pair<A, B>(A first, B second) {}
     private ArrayList<Pair<Integer, Integer>> pos = new ArrayList<>();
@@ -80,10 +81,29 @@ public class ChessDisplay {
 
     }
 
+    private void highlightHelper(PrintStream out, boolean highlightSquare, int boardCol, int rowNum) {
+        if (highlightSquare) {
+            boolean isGraySquare = (boardCol % 2 == 0) == (rowNum % 2 == 0);
+            if (isGraySquare) {
+                setDarkGreen(out);
+                this.backgroundColor = SET_BG_COLOR_DARK_GREEN;
+            } else {
+                setGreen(out);
+                this.backgroundColor = SET_BG_COLOR_GREEN;
+            }
+        } else if ((boardCol % 2 == 0) == (rowNum % 2 == 0)) {
+            setGray(out);
+            this.backgroundColor = SET_BG_COLOR_LIGHT_GREY;
+        } else {
+            setWhite(out);
+            this.backgroundColor = SET_BG_COLOR_WHITE;
+        }
+    }
+
     private void drawRowSquaresBlack(PrintStream out, int rowNum) {
         for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
             for (int boardCol=BOARD_WIDTH-1; boardCol>=0; --boardCol) {
-                String backgroundColor = SET_BG_COLOR_BLACK;
+                this.backgroundColor = SET_BG_COLOR_BLACK;
                 int sideHeader = rowNum;
                 boolean highlightSquare = false;
                 Pair<Integer, Integer> check = new Pair<>(rowNum + 1, boardCol + 1);
@@ -94,22 +114,7 @@ public class ChessDisplay {
                     out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
 
-                if (highlightSquare) {
-                    boolean isGraySquare = (boardCol % 2 == 0) == (rowNum % 2 == 0);
-                    if (isGraySquare) {
-                        setDarkGreen(out);
-                        backgroundColor = SET_BG_COLOR_DARK_GREEN;
-                    } else {
-                        setGreen(out);
-                        backgroundColor = SET_BG_COLOR_GREEN;
-                    }
-                } else if ((boardCol % 2 == 0) == (rowNum % 2 == 0)) {
-                    setGray(out);
-                    backgroundColor = SET_BG_COLOR_LIGHT_GREY;
-                } else {
-                    setWhite(out);
-                    backgroundColor = SET_BG_COLOR_WHITE;
-                }
+                highlightHelper(out, highlightSquare, boardCol, rowNum);
 
                 int prefixLength = SQUARE_SIZE_PADDED / 2;
                 int suffixLength = 0;
@@ -144,7 +149,7 @@ public class ChessDisplay {
     private void drawRowSquares(PrintStream out, int rowNum) {
         for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
             for (int boardCol=0; boardCol<BOARD_HEIGHT; ++boardCol) {
-                String backgroundColor = SET_BG_COLOR_BLACK;
+                this.backgroundColor = SET_BG_COLOR_BLACK;
                 boolean highlightSquare = false;
                 Pair<Integer, Integer> check = new Pair<>(rowNum + 1, boardCol + 1);
                 if (pos.contains(check)) {
@@ -155,22 +160,7 @@ public class ChessDisplay {
                     out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
 
-                if (highlightSquare) {
-                    boolean isGraySquare = (boardCol % 2 == 0) == (rowNum % 2 == 0);
-                    if (isGraySquare) {
-                        setDarkGreen(out);
-                        backgroundColor = SET_BG_COLOR_DARK_GREEN;
-                    } else {
-                        setGreen(out);
-                        backgroundColor = SET_BG_COLOR_GREEN;
-                    }
-                } else if ((boardCol % 2 == 0) == (rowNum % 2 == 0)) {
-                    setGray(out);
-                    backgroundColor = SET_BG_COLOR_LIGHT_GREY;
-                } else {
-                    setWhite(out);
-                    backgroundColor = SET_BG_COLOR_WHITE;
-                }
+                highlightHelper(out, highlightSquare, boardCol, rowNum);
 
                 int prefixLength = SQUARE_SIZE_PADDED / 2;
                 int suffixLength = 0;

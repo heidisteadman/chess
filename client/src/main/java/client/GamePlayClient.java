@@ -97,8 +97,9 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
 
     private String leave() throws ResponseException{
         ws.leave(authToken, gameID);
-        gameID = 0;
-        joinedCol = null;
+        this.gameID = 0;
+        this.joinedCol = null;
+        this.authToken = null;
         return "You left the game.";
     }
 

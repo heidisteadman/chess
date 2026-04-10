@@ -39,6 +39,7 @@ public class Repl {
                     System.out.println(client.help());
                 } else if (result.contains("logged out") || result.contains("Database cleared")) {
                     state = State.SIGNEDOUT;
+                    prelog.nullifyAuth();
                     client = prelog;
                     System.out.println(client.help());
                 } else if (result.contains("joined") || result.contains("observing")) {
