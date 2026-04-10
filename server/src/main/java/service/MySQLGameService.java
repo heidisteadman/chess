@@ -78,7 +78,8 @@ public class MySQLGameService {
             gameDAO.joinGame(gid, user, blackUser);
             return new MySQLGameService.JoinGameResponse();
         } else if (!(Objects.equals(j.playerColor, "BLACK")) && !(Objects.equals(j.playerColor, "WHITE"))) {
-            throw new ResponseException(400, "Error: bad request");
+            //throw new ResponseException(400, "Error: bad request");
+            return new MySQLGameService.JoinGameResponse();
         } else {
             throw new ResponseException(403, "Error: Already Taken");
         }

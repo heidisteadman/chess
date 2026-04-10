@@ -62,12 +62,12 @@ public class MySQLGameDAO implements SQLGameDAO, SQLDAO{
     }
 
     public void joinGame(int gameID, String white, String black) throws ResponseException{
-        if (black == null) {
+        if ((black == null) && (white != null)) {
             String state = "UPDATE games SET whiteUser=? WHERE gameID=?";
             SQLDAO.executeUpdate(state, white, gameID);
         }
 
-        if (white == null) {
+        if ((white == null) && (black != null)) {
             String state = "UPDATE games SET blackUser=? WHERE gameID=?";
             SQLDAO.executeUpdate(state, black, gameID);
         }

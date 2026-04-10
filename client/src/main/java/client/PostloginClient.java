@@ -147,7 +147,7 @@ public class PostloginClient implements ChessClient {
                 }
             }
             if (game != null) {
-                joinedCol = color;
+                this.joinedCol = color;
 
                 server.joinGame(color, gameID);
                 ChessDisplay show = new ChessDisplay(game.getChess().gameBoard);
@@ -176,15 +176,16 @@ public class PostloginClient implements ChessClient {
             return "Enter a valid game ID.";
         }
         try {
-            server.joinGame("WHITE", gameID);
+            server.joinGame("", gameID);
             ArrayList<GameData> games = server.listGames();
             GameData game = null;
             for (GameData g : games) {
                 if (g.gameID() == id) {
                     game = g;
+                    this.gameID = id;
                 }
             }
-
+            this.joinedCol = "observer";
             if (game != null) {
                 ChessDisplay show = new ChessDisplay(game.getChess().gameBoard);
                 show.displayBoard(ChessGame.TeamColor.WHITE);

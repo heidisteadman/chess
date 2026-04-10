@@ -107,6 +107,9 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
         if (inputs.length < 3) {
             return "Enter a start position and end position (e.g. A2 A3).";
         }
+        if ((!joinedCol.equals("WHITE")) && (!joinedCol.equals("BLACK"))) {
+            return "An observer cannot make a move.";
+        }
         String starts = inputs[1];
         char[] start = starts.toCharArray();
         String ends = inputs[2];
@@ -133,7 +136,7 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
     }
 
     private ChessMove promotePawn(ChessPosition start, ChessPosition end) {
-        if ((start.getRow() == 7) || (start.getRow() == 2)) {
+        if ((end.getRow() == 8) || (end.getRow() == 1)) {
             System.out.println("You can promote this pawn. Choose QUEEN | BISHOP | ROOK | KNIGHT");
             System.out.println("GAMEPLAY >>> ");
             Scanner scanner = new Scanner(System.in);
