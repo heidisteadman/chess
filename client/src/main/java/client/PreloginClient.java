@@ -77,6 +77,7 @@ public class PreloginClient implements ChessClient{
         UserData u = new UserData(user, pass, "");
         try {
             AuthData logged = server.login(u);
+            this.authToken = logged.getToken();
             return ("Success! You logged in as " + logged.username());
         } catch (ResponseException x) {
             if (x.getCode() == 401) {

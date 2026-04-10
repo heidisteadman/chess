@@ -4,7 +4,6 @@ import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -66,19 +65,19 @@ public class ChessDisplay {
 
 
     private void drawBoard(PrintStream out, ChessGame.TeamColor color) {
-        if (color == ChessGame.TeamColor.BLACK) {
-            for (int boardRow=0; boardRow<BOARD_HEIGHT; ++boardRow) {
-                drawRowSquaresBlack(out, boardRow);
+        boolean isBlack = color == ChessGame.TeamColor.BLACK;
+        if (isBlack) {
+            for (int boardRow = 0; boardRow < BOARD_HEIGHT; ++boardRow) {
+                drawRowSquares(out, boardRow, true);
             }
         } else {
-            for (int boardRow=BOARD_HEIGHT-1; boardRow>=0; --boardRow) {
-                drawRowSquares(out, boardRow);
-                if (boardRow<BOARD_HEIGHT-1) {
+            for (int boardRow = BOARD_HEIGHT - 1; boardRow >= 0; --boardRow) {
+                drawRowSquares(out, boardRow, false);
+                if (boardRow < BOARD_HEIGHT - 1) {
                     setBlack(out);
                 }
             }
         }
-
     }
 
     private void highlightHelper(PrintStream out, boolean highlightSquare, int boardCol, int rowNum) {
@@ -100,90 +99,39 @@ public class ChessDisplay {
         }
     }
 
-    private void drawRowSquaresBlack(PrintStream out, int rowNum) {
-        for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
-            for (int boardCol=BOARD_WIDTH-1; boardCol>=0; --boardCol) {
+    private void drawRowSquares(PrintStream out, int rowNum, boolean isBlackPerspective) {
+        int startCol = isBlackPerspective ? BOARD_WIDTH - 1 : 0;
+        int endCol = isBlackPerspective ? -1 : BOARD_HEIGHT;
+        int step = isBlackPerspective ? -1 : 1;
+        int labelCol = isBlackPerspective ? BOARD_WIDTH - 1 : 0;
+        int labelColEnd = isBlackPerspective ? 0 : BOARD_WIDTH - 1;
+
+        for (int squareRow = 0; squareRow < SQUARE_SIZE_PADDED; ++squareRow) {
+            for (int boardCol = startCol; boardCol != endCol; boardCol += step) {
                 this.backgroundColor = SET_BG_COLOR_BLACK;
                 int sideHeader = rowNum;
-                boolean highlightSquare = false;
-                Pair<Integer, Integer> check = new Pair<>(rowNum + 1, boardCol + 1);
-                if (pos.contains(check)) {
-                    highlightSquare = true;
-                }
-                if (boardCol == 7) {
+
+                boolean highlightSquare = pos.contains(new Pair<>(rowNum + 1, boardCol + 1));
+
+                if (boardCol == labelCol) {
                     out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
 
                 highlightHelper(out, highlightSquare, boardCol, rowNum);
 
-                int prefixLength = SQUARE_SIZE_PADDED / 2;
-                int suffixLength = 0;
-
-                out.print(EMPTY.repeat(prefixLength));
-                ChessPosition square = new ChessPosition(rowNum +1, boardCol+1);
-                ChessPiece piece = board.getPiece(square);
+                out.print(EMPTY.repeat(SQUARE_SIZE_PADDED / 2));
+                ChessPiece piece = board.getPiece(new ChessPosition(rowNum + 1, boardCol + 1));
                 String symbol = EMPTY;
-
                 if (piece != null) {
-                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                        symbol = getWhitePiece(piece);
-                    } else {
-                        symbol = getBlackPiece(piece);
-                    }
+                    symbol = piece.getTeamColor() == ChessGame.TeamColor.WHITE
+                            ? getWhitePiece(piece) : getBlackPiece(piece);
                 }
 
                 printPlayer(out, symbol, backgroundColor);
                 out.print(backgroundColor);
-                out.print(EMPTY.repeat(suffixLength));
 
                 setBlack(out);
-                if (boardCol == 0) {
-                    out.print(SET_TEXT_COLOR_GREEN + ++sideHeader);
-                }
-            }
-
-            out.println();
-        }
-    }
-
-    private void drawRowSquares(PrintStream out, int rowNum) {
-        for (int squareRow=0; squareRow<SQUARE_SIZE_PADDED; ++squareRow) {
-            for (int boardCol=0; boardCol<BOARD_HEIGHT; ++boardCol) {
-                this.backgroundColor = SET_BG_COLOR_BLACK;
-                boolean highlightSquare = false;
-                Pair<Integer, Integer> check = new Pair<>(rowNum + 1, boardCol + 1);
-                if (pos.contains(check)) {
-                    highlightSquare = true;
-                }
-                int sideHeader = rowNum;
-                if (boardCol == 0) {
-                    out.print(backgroundColor + SET_TEXT_COLOR_GREEN + ++sideHeader);
-                }
-
-                highlightHelper(out, highlightSquare, boardCol, rowNum);
-
-                int prefixLength = SQUARE_SIZE_PADDED / 2;
-                int suffixLength = 0;
-
-                out.print(EMPTY.repeat(prefixLength));
-                ChessPosition square = new ChessPosition(rowNum +1, boardCol+1);
-                ChessPiece piece = board.getPiece(square);
-                String symbol = EMPTY;
-
-                if (piece != null) {
-                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                        symbol = getWhitePiece(piece);
-                    } else {
-                        symbol = getBlackPiece(piece);
-                    }
-                }
-
-                printPlayer(out, symbol, backgroundColor);
-                out.print(backgroundColor);
-                out.print(EMPTY.repeat(suffixLength));
-
-                setBlack(out);
-                if (boardCol == 7) {
+                if (boardCol == labelColEnd) {
                     out.print(SET_TEXT_COLOR_GREEN + ++sideHeader);
                 }
             }
