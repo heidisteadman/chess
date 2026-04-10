@@ -98,7 +98,7 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
     private String leave() throws ResponseException{
         ws.leave(authToken, gameID);
         gameID = 0;
-        authToken = null;
+        joinedCol = null;
         return "You left the game.";
     }
 
@@ -122,11 +122,38 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
                 ChessPosition startPos = new ChessPosition(startRow, startCol);
                 ChessPosition endPos = new ChessPosition((end[1]-'0'), (end[0]-'A'+1));
                 ChessMove move = new ChessMove(startPos, endPos, null);
+                if (game.getBoard().getPiece(startPos).getPieceType() == ChessPiece.PieceType.PAWN) {
+                    move = promotePawn(startPos, endPos);
+                }
                 ws.makeMove(authToken, gameID, move);
                 return String.format("You moved your piece at <%s> to <%s>.", starts, ends);
             }
         }
         return "Enter a valid start position and end position (e.g. A2 A3).";
+    }
+
+    private ChessMove promotePawn(ChessPosition start, ChessPosition end) {
+        if ((start.getRow() == 7) || (start.getRow() == 2)) {
+            System.out.println("You can promote this pawn. Choose QUEEN | BISHOP | ROOK | KNIGHT");
+            System.out.println("GAMEPLAY >>> ");
+            Scanner scanner = new Scanner(System.in);
+            String promote = scanner.nextLine().trim();
+            switch (promote) {
+                case "QUEEN" -> {
+                    return new ChessMove(start, end, ChessPiece.PieceType.QUEEN);
+                }
+                case "BISHOP" -> {
+                    return new ChessMove(start, end, ChessPiece.PieceType.BISHOP);
+                }
+                case "ROOK" -> {
+                    return new ChessMove(start, end, ChessPiece.PieceType.ROOK);
+                }
+                case "KNIGHT" -> {
+                    return new ChessMove(start, end, ChessPiece.PieceType.KNIGHT);
+                }
+            }
+        }
+        return new ChessMove(start, end, null);
     }
 
     private String highlight(String in) {
@@ -159,6 +186,7 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
 
     private String resign() throws ResponseException {
         System.out.println("You are attempting to resign. Are you sure?");
+        System.out.println("GAMEPLAY >>> ");
         Scanner scan = new Scanner(System.in);
         String confirm = scan.nextLine().trim().toLowerCase();
         if (confirm.equals("yes")) {
@@ -195,6 +223,12 @@ public class GamePlayClient implements ChessClient, NotificationHandler {
         Gson gson = gsonBuilder.create();
         game = gson.fromJson(load.getGame(), ChessGame.class);
         ChessDisplay dis = new ChessDisplay(game.getBoard());
-        dis.displayBoard(game.teamTurn);
+        ChessGame.TeamColor disCol;
+        if (joinedCol.equals("WHITE")) {
+            disCol = ChessGame.TeamColor.WHITE;
+        } else {
+            disCol = ChessGame.TeamColor.BLACK;
+        }
+        dis.displayBoard(disCol);
     }
 }

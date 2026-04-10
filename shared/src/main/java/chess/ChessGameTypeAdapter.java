@@ -17,7 +17,7 @@ public class ChessGameTypeAdapter implements JsonDeserializer<ChessGame> {
             teamTurn = ChessGame.TeamColor.BLACK;
         }
         JsonObject board = element.getAsJsonObject().get("gameBoard").getAsJsonObject();
-        JsonArray array = board.get("gameBoard").getAsJsonArray();
+        JsonArray array = board.get("squares").getAsJsonArray();
         for (int row = 0; row < array.size(); row++) {
             JsonArray pieceRow = array.get(row).getAsJsonArray();
             for (int col = 0; col < pieceRow.size(); col++) {
