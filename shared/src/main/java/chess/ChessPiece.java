@@ -358,7 +358,7 @@ public class ChessPiece {
                     if (myPosition.getRow() != 7) {
                         myWhitePawnMoves.add(moveUpLeft);
                     } else {
-                        myWhitePawnMoves.addAll(pawnPromoteHelper(myPosition, new ChessPosition((myPosition.getRow()+1), (myPosition.getColumn()-1))));
+                        myWhitePawnMoves.addAll(pawnPromoteHelper(myPosition,new ChessPosition((myPosition.getRow()+1),(myPosition.getColumn()-1))));
                     }
                 }
             }
@@ -370,7 +370,7 @@ public class ChessPiece {
                     if (myPosition.getRow() != 7) {
                         myWhitePawnMoves.add(moveUpRight);
                     } else {
-                        myWhitePawnMoves.addAll(pawnPromoteHelper(myPosition, new ChessPosition((myPosition.getRow()+1), (myPosition.getColumn()+1))));
+                        myWhitePawnMoves.addAll(pawnPromoteHelper(myPosition,new ChessPosition((myPosition.getRow()+1),(myPosition.getColumn()+1))));
                     }
                 }
             }
@@ -403,7 +403,7 @@ public class ChessPiece {
                     if (myPosition.getRow() != 2) {
                         myBlackPawnMoves.add(moveForwardRight);
                     } else {
-                        myBlackPawnMoves.addAll(pawnPromoteHelper(myPosition, new ChessPosition((myPosition.getRow()-1), (myPosition.getColumn()-1))));
+                        myBlackPawnMoves.addAll(pawnPromoteHelper(myPosition,new ChessPosition((myPosition.getRow()-1),(myPosition.getColumn()-1))));
                     }
                 }
             }

@@ -100,7 +100,10 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void staleHelper(Session session, MakeMoveCommand moveCommand, NotificationMessage stale, MySQLGameDAO gameDAO) throws IOException, ResponseException {
+    private void staleHelper(Session session,
+                             MakeMoveCommand moveCommand,
+                             NotificationMessage stale,
+                             MySQLGameDAO gameDAO) throws IOException, ResponseException {
         GameData game = gameDAO.getGame(moveCommand.getGameID());
         connections.broadcast(session, moveCommand.getGameID(), stale);
         sendMessage(session.getRemote(), stale);
@@ -123,10 +126,14 @@ public class WebsocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             sendMessage(session.getRemote(), error);
             return;
         }
-        if ((Objects.equals(username, game.whiteUsername())) && (game.getChess().getTeamTurn() == ChessGame.TeamColor.WHITE) && (isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.WHITE)!=null)) {
+        if ((Objects.equals(username, game.whiteUsername())) &&
+                (game.getChess().getTeamTurn() == ChessGame.TeamColor.WHITE) &&
+                (isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.WHITE)!=null)) {
             NotificationMessage stale = new NotificationMessage(isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.WHITE));
             staleHelper(session, moveCommand, stale, gameDAO);
-        } else if ((Objects.equals(username, game.blackUsername())) && (game.getChess().getTeamTurn() == ChessGame.TeamColor.BLACK) && (isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.BLACK)!=null)) {
+        } else if ((Objects.equals(username, game.blackUsername())) &&
+                (game.getChess().getTeamTurn() == ChessGame.TeamColor.BLACK) &&
+                (isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.BLACK)!=null)) {
             NotificationMessage stale = new NotificationMessage(isStalemate(moveCommand.getGameID(), ChessGame.TeamColor.BLACK));
             staleHelper(session, moveCommand, stale, gameDAO);
         }
